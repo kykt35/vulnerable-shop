@@ -1,0 +1,13 @@
+<%- include("partials/header", { title: "Home", currentUser }) %>
+
+<div class="card">
+  <h2>ようこそ</h2>
+  <p>これは脆弱性体験用のECサイトです。上部メニューから各体験へ進めます。</p>
+  <ul>
+    <li><a href="/hands-on">Hands-on 手順</a></li>
+    <li><a href="/products">商品一覧</a></li>
+    <li><a href="/search">商品検索（SQL Injection）</a></li>
+  </ul>
+</div>
+
+<%- include("partials/footer") %>

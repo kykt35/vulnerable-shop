@@ -1,0 +1,54 @@
+<%- include("partials/header", { title: "ログイン", currentUser }) %>
+
+<div class="card">
+  <h2>ログイン</h2>
+  <% if (error) { %>
+    <p style="color: #b00020;"><%= error %></p>
+  <% } %>
+  <form method="post" action="/login">
+    <label>ユーザー名</label>
+    <input name="username" autocomplete="username" required />
+
+    <label>パスワード</label>
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; margin-bottom: 10px;">
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        style="margin: 0; flex: 1;"
+      />
+      <button
+        id="togglePassword"
+        type="button"
+        style="white-space: nowrap;"
+        aria-controls="password"
+        aria-pressed="false"
+      >
+        表示
+      </button>
+    </div>
+
+    <button type="submit">ログイン</button>
+  </form>
+  <script>
+    (() => {
+      const pw = document.getElementById("password");
+      const toggle = document.getElementById("togglePassword");
+      if (!pw || !toggle) return;
+      toggle.addEventListener("click", () => {
+        const show = pw.type === "password";
+        pw.type = show ? "text" : "password";
+        toggle.textContent = show ? "非表示" : "表示";
+        toggle.setAttribute("aria-pressed", String(show));
+      });
+    })();
+  </script>
+
+  <div class="muted">
+    Seedアカウント例: <code>alice / password123</code>, <code>bob / password123</code>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

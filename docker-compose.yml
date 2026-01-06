@@ -1,0 +1,24 @@
+services:
+  shop:
+    build:
+      context: ./apps/shop
+    environment:
+      - PORT=8000
+      - SESSION_SECRET=dev-secret
+      - DATABASE_PATH=/data/shop.db
+      - ATTACKER_URL=http://localhost:9000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./db_data:/data
+
+  attacker:
+    build:
+      context: ./apps/attacker
+    environment:
+      - PORT=9000
+      - TARGET_BASE=http://localhost:8000
+    ports:
+      - "9000:9000"
+    depends_on:
+      - shop

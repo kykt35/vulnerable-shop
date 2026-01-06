@@ -1,0 +1,45 @@
+<%- include("partials/header", { title: "商品検索（SQLi）", currentUser }) %>
+
+<div class="card">
+  <h2>商品検索（SQL Injection）</h2>
+  <p class="muted">
+    学習用に、検索クエリ <code>q</code> を文字列結合でSQLに埋め込んでいます。
+  </p>
+
+  <form method="get" action="/search">
+    <label>検索キーワード</label>
+    <input name="q" value="<%= q || "" %>" placeholder="例: coffee" />
+    <button type="submit">検索</button>
+  </form>
+
+  <% if (sql) { %>
+    <div class="muted">実行SQL:</div>
+    <pre><code><%= sql %></code></pre>
+  <% } %>
+</div>
+
+<% if (results) { %>
+  <h3>結果</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>description</th>
+        <th>price_yen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% results.forEach((r) => { %>
+        <tr>
+          <td><%= r.id %></td>
+          <td><%= r.name %></td>
+          <td><%= r.description %></td>
+          <td><%= r.price_yen %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include("partials/footer") %>

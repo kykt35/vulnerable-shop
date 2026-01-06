@@ -1,0 +1,46 @@
+<%- include("partials/header", { title: "購入（改ざん/CSRF）", currentUser }) %>
+
+<div class="card">
+  <h2>購入</h2>
+  <p><strong><%= product.name %></strong></p>
+  <p class="muted">定価: <%= product.price_yen %> 円</p>
+
+<p class="muted">
+  学習用に、<code>unit_price_yen</code> と <code>total_yen</code> を hidden で送っています。
+  数量を変えるとフロントで合計を再計算します。DevToolsで単価や合計を書き換えると、そのまま保存されます。
+</p>
+
+  <form method="post" action="/purchase">
+    <input type="hidden" name="product_id" value="<%= product.id %>" />
+
+    <label>数量</label>
+    <input name="quantity" type="number" min="1" value="1" />
+
+    <!-- Param Tampering 脆弱性: サーバが信用してしまう -->
+    <input type="hidden" name="unit_price_yen" value="<%= product.price_yen %>" />
+  <input id="totalYen" type="hidden" name="total_yen" value="<%= product.price_yen %>" />
+
+    <label>メモ（任意）</label>
+    <input name="note" placeholder="例: 置き配希望" />
+
+    <button type="submit">購入する</button>
+  </form>
+<script>
+  (() => {
+    const qty = document.querySelector('input[name="quantity"]');
+    const unitPrice = document.querySelector('input[name="unit_price_yen"]');
+    const total = document.getElementById("totalYen");
+    if (!qty || !unitPrice || !total) return;
+    const update = () => {
+      const q = parseInt(qty.value, 10);
+      const n = Number.isFinite(q) && q > 0 ? q : 1;
+      const u = Number(unitPrice.value);
+      total.value = Number.isFinite(u) ? u * n : n;
+    };
+    qty.addEventListener("input", update);
+    update();
+  })();
+</script>
+</div>
+
+<%- include("partials/footer") %>

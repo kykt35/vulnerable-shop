@@ -1,0 +1,50 @@
+<%- include("partials/header", { title: "Hands-on", currentUser }) %>
+
+<div class="card">
+  <h2>Hands-on 手順（このアプリ内）</h2>
+  <p class="muted">※本番利用厳禁。学習用に意図的な脆弱性を含みます。</p>
+</div>
+
+<div class="card">
+  <h3>体験① XSS</h3>
+  <ol>
+    <li><a href="/login">ログイン</a>（例: <code>alice / password123</code>）</li>
+    <li><a href="/products/1">商品詳細</a>へ移動</li>
+    <li>コメントに <code>&lt;script&gt;alert('XSS!')&lt;/script&gt;</code> を投稿</li>
+    <li>表示時にアラートが動くことを確認</li>
+  </ol>
+  <p class="muted">原因: コメント表示が無エスケープ（<code>&lt;%- %&gt;</code>）</p>
+</div>
+
+<div class="card">
+  <h3>体験② SQL Injection</h3>
+  <ol>
+    <li><a href="/search">商品検索</a>へ移動</li>
+    <li>検索欄に <code>' OR 1=1 -- </code> を入れて結果が増えることを確認（末尾に半角スペース推奨）</li>
+    <li>UNION例（ユーザー情報の混入）: <code>' UNION SELECT id, username, email, 0 FROM users -- </code></li>
+    <li class="muted">（任意）ログインでもSQLi可: usernameに <code>' OR 1=1 -- </code></li>
+  </ol>
+  <p class="muted">原因: 検索SQLを文字列結合で組み立て</p>
+</div>
+
+<div class="card">
+  <h3>体験③ フォーム値改ざん（Param Tampering）</h3>
+  <ol>
+    <li><a href="/purchase/1">購入フォーム</a>へ移動</li>
+    <li>DevToolsで hidden の <code>unit_price_yen</code> / <code>total_yen</code> を書き換える（フロント計算を改ざん）</li>
+    <li>購入後、<a href="/orders">注文履歴</a>で改ざんされた価格で保存されていることを確認</li>
+  </ol>
+  <p class="muted">原因: サーバ側で価格を再計算せず、送信値を信用</p>
+</div>
+
+<div class="card">
+  <h3>体験④ CSRF</h3>
+  <ol>
+    <li>Shopにログインした状態で、<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">Attackerサイト</a>を開く</li>
+    <li>Attackerの操作で、勝手に購入が実行されることを確認</li>
+    <li><a href="/orders">注文履歴</a>に増えていることを確認</li>
+  </ol>
+  <p class="muted">注: ブラウザのSameSite挙動を避けるため、学習用に GET で購入できるエンドポイントも用意しています。</p>
+</div>
+
+<%- include("partials/footer") %>

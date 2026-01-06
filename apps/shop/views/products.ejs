@@ -1,0 +1,16 @@
+<%- include("partials/header", { title: "商品一覧", currentUser }) %>
+
+<h2>商品一覧</h2>
+
+<% products.forEach((p) => { %>
+  <div class="card">
+    <div><strong><a href="/products/<%= p.id %>"><%= p.name %></a></strong></div>
+    <div class="muted"><%= p.price_yen %> 円</div>
+    <div><%= p.description %></div>
+    <div style="margin-top: 8px;">
+      <a href="/purchase/<%= p.id %>">購入へ</a>
+    </div>
+  </div>
+<% }) %>
+
+<%- include("partials/footer") %>

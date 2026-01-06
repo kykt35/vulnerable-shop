@@ -1,0 +1,16 @@
+<%- include("partials/header", { title: "購入完了", currentUser }) %>
+
+<div class="card">
+  <h2>購入完了</h2>
+  <p>注文を保存しました。</p>
+  <ul>
+    <li>order_id: <code><%= order.id %></code></li>
+    <li>product_id: <code><%= order.product_id %></code></li>
+    <li>quantity: <code><%= order.quantity %></code></li>
+    <li>unit_price_yen: <code><%= order.unit_price_yen %></code></li>
+    <li>total_yen: <code><%= order.total_yen %></code></li>
+  </ul>
+  <p><a href="/orders">注文履歴を見る</a></p>
+</div>
+
+<%- include("partials/footer") %>

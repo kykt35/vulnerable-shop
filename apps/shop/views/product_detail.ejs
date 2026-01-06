@@ -1,0 +1,36 @@
+<%- include("partials/header", { title: product.name, currentUser }) %>
+
+<div class="card">
+  <h2><%= product.name %></h2>
+  <div class="muted"><%= product.price_yen %> 円</div>
+  <p><%= product.description %></p>
+  <p><a href="/purchase/<%= product.id %>">購入へ</a></p>
+</div>
+
+<div class="card">
+  <h3>コメント（XSS）</h3>
+  <p class="muted">学習用に、コメント本文を無エスケープで描画しています。</p>
+
+  <% if (!currentUser) { %>
+    <p><a href="/login">ログイン</a>するとコメントできます。</p>
+  <% } else { %>
+    <form method="post" action="/products/<%= product.id %>/comments">
+      <label>コメント本文</label>
+      <textarea name="body" rows="3" placeholder="<script>alert(1)</script>"></textarea>
+      <button type="submit">投稿</button>
+    </form>
+  <% } %>
+
+  <h4>投稿一覧</h4>
+  <% comments.forEach((c) => { %>
+    <div class="card">
+      <div class="muted"><%= c.created_at %> by <%= c.username %></div>
+      <div>
+        <!-- XSS脆弱性: 無エスケープ -->
+        <%- c.body %>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,22 @@
+<%- include("partials/header", { title: "注文履歴", currentUser }) %>
+
+<h2>注文履歴</h2>
+
+<% if (orders.length === 0) { %>
+  <div class="card">まだ注文がありません。</div>
+<% } %>
+
+<% orders.forEach((o) => { %>
+  <div class="card">
+    <div class="muted"><%= o.created_at %></div>
+    <div><strong><%= o.product_name %></strong></div>
+    <div>quantity: <code><%= o.quantity %></code></div>
+      <div>unit_price_yen: <code><%= o.unit_price_yen %></code></div>
+      <div>total_yen: <code><%= o.total_yen %></code></div>
+    <% if (o.note) { %>
+      <div class="muted">note: <%= o.note %></div>
+    <% } %>
+  </div>
+<% }) %>
+
+<%- include("partials/footer") %>
