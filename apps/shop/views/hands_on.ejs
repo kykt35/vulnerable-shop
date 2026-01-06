@@ -1,50 +1,66 @@
 <%- include("partials/header", { title: "Hands-on", currentUser }) %>
 
 <div class="card">
-  <h2>Hands-on 手順（このアプリ内）</h2>
-  <p class="muted">※本番利用厳禁。学習用に意図的な脆弱性を含みます。</p>
+  <h2>Hands-on 手順</h2>
+  <p class="muted">※本番環境では絶対に試さないでください。学習用に意図的な脆弱性を含んでいます。</p>
 </div>
 
 <div class="card">
-  <h3>体験① XSS</h3>
+  <h3>体験① XSS (Cross-Site Scripting)</h3>
+  <p><strong>【体験①：検索結果への注入】</strong></p>
   <ol>
-    <li><a href="/login">ログイン</a>（例: <code>alice / password123</code>）</li>
-    <li><a href="/products/1">商品詳細</a>へ移動</li>
-    <li>コメントに <code>&lt;script&gt;alert('XSS!')&lt;/script&gt;</code> を投稿</li>
-    <li>表示時にアラートが動くことを確認</li>
+    <li><a href="/search">商品検索</a>へ移動</li>
+    <li>検索欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を入力して検索</li>
+    <li>アラートが表示されることを確認</li>
   </ol>
-  <p class="muted">原因: コメント表示が無エスケープ（<code>&lt;%- %&gt;</code>）</p>
+  <p><strong>【体験②：コメント欄への注入（蓄積型）】</strong></p>
+  <ol>
+    <li><a href="/login">ログイン</a>（alice / password123）</li>
+    <li>任意の<a href="/products/1">商品詳細</a>へ移動</li>
+    <li>コメント欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を投稿</li>
+    <li>再度その商品ページを開くと、アラートが表示されることを確認</li>
+  </ol>
+  <p class="muted">原因: 入力値がエスケープされずに HTML として出力されている</p>
 </div>
 
 <div class="card">
   <h3>体験② SQL Injection</h3>
+  <p><strong>【体験①：ログイン突破】</strong></p>
+  <ol>
+    <li><a href="/login">ログイン画面</a>へ移動</li>
+    <li>ユーザー名に <code>' OR 1=1 -- </code> と入力（末尾に半角スペース）</li>
+    <li>パスワードは何でも良いので入力してログインをクリック</li>
+  </ol>
+  <p><strong>【体験②：情報の漏洩（UNION攻撃）】</strong></p>
   <ol>
     <li><a href="/search">商品検索</a>へ移動</li>
-    <li>検索欄に <code>' OR 1=1 -- </code> を入れて結果が増えることを確認（末尾に半角スペース推奨）</li>
-    <li>UNION例（ユーザー情報の混入）: <code>' UNION SELECT id, username, email, 0 FROM users -- </code></li>
-    <li class="muted">（任意）ログインでもSQLi可: usernameに <code>' OR 1=1 -- </code></li>
+    <li>検索欄に <code>' UNION SELECT id, username, password, 0 FROM users -- </code> を入力</li>
+    <li>検索結果にユーザーのメールアドレスやパスワードが表示されることを確認</li>
   </ol>
-  <p class="muted">原因: 検索SQLを文字列結合で組み立て</p>
+  <p class="muted">原因: SQL文を文字列結合で組み立てているため、命令を注入できる</p>
 </div>
 
 <div class="card">
-  <h3>体験③ フォーム値改ざん（Param Tampering）</h3>
+  <h3>体験③ フォーム値改ざん</h3>
   <ol>
-    <li><a href="/purchase/1">購入フォーム</a>へ移動</li>
-    <li>DevToolsで hidden の <code>unit_price_yen</code> / <code>total_yen</code> を書き換える（フロント計算を改ざん）</li>
-    <li>購入後、<a href="/orders">注文履歴</a>で改ざんされた価格で保存されていることを確認</li>
+    <li>商品を選択し、<a href="/purchase/1">購入画面</a>へ進む</li>
+    <li>「注文確定」ボタン付近で右クリック → 「検証（インスペクト）」を選択</li>
+    <li>デベロッパーツールで <code>name="unit_price_yen"</code> の <code>value</code> を <code>1</code> に書き換える</li>
+    <li>数量を変更し、単価が1円になっていることを確認して「注文確定」をクリック</li>
+    <li><a href="/orders">注文履歴</a>で1円で購入できていることを確認</li>
   </ol>
-  <p class="muted">原因: サーバ側で価格を再計算せず、送信値を信用</p>
+  <p class="muted">原因: クライアントから送られた「価格」をサーバー側で再チェックしていない</p>
 </div>
 
 <div class="card">
-  <h3>体験④ CSRF</h3>
+  <h3>体験④ CSRF (Cross-Site Request Forgery)</h3>
   <ol>
-    <li>Shopにログインした状態で、<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">Attackerサイト</a>を開く</li>
-    <li>Attackerの操作で、勝手に購入が実行されることを確認</li>
-    <li><a href="/orders">注文履歴</a>に増えていることを確認</li>
+    <li>ショップにログインした状態にする</li>
+    <li>新しいタブで<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">攻撃用サイト（景品当選サイト）</a>を開く</li>
+    <li>「🎁 景品を受け取る」をクリック</li>
+    <li>ショップの<a href="/orders">注文履歴</a>を確認し、勝手に注文が増えていることを確認</li>
   </ol>
-  <p class="muted">備考: Attackerサイトは <code>/purchase</code> へPOST送信（CSRFトークンなし）。</p>
+  <p class="muted">原因: リクエストが「正しい画面から送られたか」をサーバーが検証していない</p>
 </div>
 
 <%- include("partials/footer") %>
