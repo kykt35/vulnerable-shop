@@ -324,34 +324,6 @@ app.post("/purchase", requireLogin, (req, res) => {
   res.render("order_done", { order, currentUser: res.locals.currentUser });
 });
 
-// CSRF体験用（学習用）: GETでも購入できる（SameSiteの影響を避けて再現性を上げる）
-app.get("/csrf/purchase", requireLogin, (req, res) => {
-  const productId = Number(req.query.product_id);
-  const product = db.prepare("SELECT * FROM products WHERE id = ?").get(productId);
-  if (!product) return res.status(404).send("Not Found");
-
-  const quantityRaw = parseInt(req.query.quantity, 10);
-  const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0 ? quantityRaw : 1;
-
-  const unitPriceRaw = Number(req.query.unit_price_yen);
-  const unitPrice = Number.isFinite(unitPriceRaw) ? unitPriceRaw : product.price_yen;
-  const totalRaw = Number(req.query.total_yen);
-  const total = Number.isFinite(totalRaw) ? totalRaw : unitPrice * quantity;
-
-  const note = String(req.query.note || "");
-
-  const order = createOrderFromParams({
-    userId: req.session.userId,
-    productId,
-    quantity,
-    unitPrice,
-    total,
-    note
-  });
-
-  res.render("order_done", { order, currentUser: res.locals.currentUser });
-});
-
 app.get("/orders", requireLogin, (req, res) => {
   const orders = db
     .prepare(

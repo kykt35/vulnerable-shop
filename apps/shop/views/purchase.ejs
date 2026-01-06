@@ -6,8 +6,8 @@
   <p class="muted">定価: <%= product.price_yen %> 円</p>
 
 <p class="muted">
-  学習用に、<code>unit_price_yen</code> と <code>total_yen</code> を hidden で送っています。
-  数量を変えるとフロントで合計を再計算します。DevToolsで単価や合計を書き換えると、そのまま保存されます。
+  学習用に、合計金額をフロントで計算しています。<br/>
+  DevToolsで単価や合計を書き換えると、そのまま保存されます。
 </p>
 
   <form method="post" action="/purchase">
@@ -18,7 +18,16 @@
 
     <!-- Param Tampering 脆弱性: サーバが信用してしまう -->
     <input type="hidden" name="unit_price_yen" value="<%= product.price_yen %>" />
-  <input id="totalYen" type="hidden" name="total_yen" value="<%= product.price_yen %>" />
+
+    <label>合計（円）</label>
+    <input
+      id="totalYen"
+      name="total_yen"
+      type="number"
+      readonly
+      value="<%= product.price_yen %>"
+      style="background: #f7f7f7; color: #555; cursor: not-allowed;"
+    />
 
     <label>メモ（任意）</label>
     <input name="note" placeholder="例: 置き配希望" />
@@ -38,6 +47,7 @@
       total.value = Number.isFinite(u) ? u * n : n;
     };
     qty.addEventListener("input", update);
+    qty.addEventListener("change", update);
     update();
   })();
 </script>
