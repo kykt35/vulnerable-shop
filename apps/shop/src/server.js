@@ -5,7 +5,7 @@ const session = require("express-session");
 const morgan = require("morgan");
 const Database = require("better-sqlite3");
 
-const PORT = Number(process.env.PORT || 4000);
+const PORT = Number(process.env.PORT || 8000);
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev-secret";
 const DATABASE_PATH =
   process.env.DATABASE_PATH || path.join(__dirname, "..", "data", "shop.db");

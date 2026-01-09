@@ -13,7 +13,7 @@ COPY src /app/src
 COPY views /app/views
 COPY public /app/public
 
-ENV PORT=4000
-EXPOSE 4000
+ENV PORT=8000
+EXPOSE 8000
 
 CMD ["node", "src/server.js"]
