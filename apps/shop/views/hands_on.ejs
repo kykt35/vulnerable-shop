@@ -1,66 +1,88 @@
 <%- include("partials/header", { title: "Hands-on", currentUser }) %>
 
-<div class="card">
-  <h2>Hands-on 手順</h2>
-  <p class="muted">※本番環境では絶対に試さないでください。学習用に意図的な脆弱性を含んでいます。</p>
+<div class="section-header">
+  <div class="section-title">
+    <span class="pill">Guide</span>
+    <h2 style="margin: 0;">Hands-on 手順</h2>
+  </div>
+  <div class="muted">本番環境では絶対に試さないでください。すべて学習用です。</div>
 </div>
 
-<div class="card">
-  <h3>体験① XSS (Cross-Site Scripting)</h3>
-  <p><strong>【体験①：検索結果への注入】</strong></p>
-  <ol>
-    <li><a href="/search">商品検索</a>へ移動</li>
-    <li>検索欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を入力して検索</li>
-    <li>アラートが表示されることを確認</li>
-  </ol>
-  <p><strong>【体験②：コメント欄への注入（蓄積型）】</strong></p>
-  <ol>
-    <li><a href="/login">ログイン</a>（alice / password123）</li>
-    <li>任意の<a href="/products/1">商品詳細</a>へ移動</li>
-    <li>コメント欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を投稿</li>
-    <li>再度その商品ページを開くと、アラートが表示されることを確認</li>
-  </ol>
-  <p class="muted">原因: 入力値がエスケープされずに HTML として出力されている</p>
+<div class="card hero stack">
+  <h3 style="margin: 0;">このアプリについて</h3>
+  <p class="muted" style="margin: 0;">意図的に脆弱な実装を含みます。下記の体験シナリオに沿って挙動を確認してください。</p>
 </div>
 
-<div class="card">
-  <h3>体験② SQL Injection</h3>
-  <p><strong>【体験①：ログイン突破】</strong></p>
-  <ol>
-    <li><a href="/login">ログイン画面</a>へ移動</li>
-    <li>ユーザー名に <code>' OR 1=1 -- </code> と入力（末尾に半角スペース）</li>
-    <li>パスワードは何でも良いので入力してログインをクリック</li>
-  </ol>
-  <p><strong>【体験②：情報の漏洩（UNION攻撃）】</strong></p>
-  <ol>
-    <li><a href="/search">商品検索</a>へ移動</li>
-    <li>検索欄に <code>' UNION SELECT id, username, password, 0 FROM users -- </code> を入力</li>
-    <li>検索結果にユーザーのメールアドレスやパスワードが表示されることを確認</li>
-  </ol>
-  <p class="muted">原因: SQL文を文字列結合で組み立てているため、命令を注入できる</p>
-</div>
+<div class="stack">
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">XSS</span>
+      <h3 style="margin: 0;">体験① XSS (Cross-Site Scripting)</h3>
+    </div>
+    <p><strong>【体験①：検索結果への注入】</strong></p>
+    <ol>
+      <li><a href="/search">商品検索</a>へ移動</li>
+      <li>検索欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を入力して検索</li>
+      <li>アラートが表示されることを確認</li>
+    </ol>
+    <p><strong>【体験②：コメント欄への注入（蓄積型）】</strong></p>
+    <ol>
+      <li><a href="/login">ログイン</a>（alice / password123）</li>
+      <li>任意の<a href="/products/1">商品詳細</a>へ移動</li>
+      <li>コメント欄に <code>&lt;script&gt;alert('XSS攻撃成功！');&lt;/script&gt;</code> を投稿</li>
+      <li>再度その商品ページを開くと、アラートが表示されることを確認</li>
+    </ol>
+    <p class="muted">原因: 入力値がエスケープされずに HTML として出力されている</p>
+  </div>
 
-<div class="card">
-  <h3>体験③ フォーム値改ざん</h3>
-  <ol>
-    <li>商品を選択し、<a href="/purchase/1">購入画面</a>へ進む</li>
-    <li>「注文確定」ボタン付近で右クリック → 「検証（インスペクト）」を選択</li>
-    <li>デベロッパーツールで <code>name="unit_price_yen"</code> の <code>value</code> を <code>1</code> に書き換える</li>
-    <li>数量を変更し、単価が1円になっていることを確認して「注文確定」をクリック</li>
-    <li><a href="/orders">注文履歴</a>で1円で購入できていることを確認</li>
-  </ol>
-  <p class="muted">原因: クライアントから送られた「価格」をサーバー側で再チェックしていない</p>
-</div>
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">SQLi</span>
+      <h3 style="margin: 0;">体験② SQL Injection</h3>
+    </div>
+    <p><strong>【体験①：ログイン突破】</strong></p>
+    <ol>
+      <li><a href="/login">ログイン画面</a>へ移動</li>
+      <li>ユーザー名に <code>' OR 1=1 -- </code> と入力（末尾に半角スペース）</li>
+      <li>パスワードは何でも良いので入力してログインをクリック</li>
+    </ol>
+    <p><strong>【体験②：情報の漏洩（UNION攻撃）】</strong></p>
+    <ol>
+      <li><a href="/search">商品検索</a>へ移動</li>
+      <li>検索欄に <code>' UNION SELECT id, username, password, 0 FROM users -- </code> を入力</li>
+      <li>検索結果にユーザーのメールアドレスやパスワードが表示されることを確認</li>
+    </ol>
+    <p class="muted">原因: SQL文を文字列結合で組み立てているため、命令を注入できる</p>
+  </div>
 
-<div class="card">
-  <h3>体験④ CSRF (Cross-Site Request Forgery)</h3>
-  <ol>
-    <li>ショップにログインした状態にする</li>
-    <li>新しいタブで<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">攻撃用サイト（景品当選サイト）</a>を開く</li>
-    <li>「🎁 景品を受け取る」をクリック</li>
-    <li>ショップの<a href="/products/1">商品詳細（Coffee Beans）</a>を確認し、勝手にコメントが投稿されていることを確認</li>
-  </ol>
-  <p class="muted">原因: リクエストが「正しい画面から送られたか」をサーバーが検証していない</p>
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">Tampering</span>
+      <h3 style="margin: 0;">体験③ フォーム値改ざん</h3>
+    </div>
+    <ol>
+      <li>商品を選択し、<a href="/purchase/1">購入画面</a>へ進む</li>
+      <li>「注文確定」ボタン付近で右クリック → 「検証（インスペクト）」を選択</li>
+      <li>デベロッパーツールで <code>name="unit_price_yen"</code> の <code>value</code> を <code>1</code> に書き換える</li>
+      <li>数量を変更し、単価が1円になっていることを確認して「注文確定」をクリック</li>
+      <li><a href="/orders">注文履歴</a>で1円で購入できていることを確認</li>
+    </ol>
+    <p class="muted">原因: クライアントから送られた「価格」をサーバー側で再チェックしていない</p>
+  </div>
+
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">CSRF</span>
+      <h3 style="margin: 0;">体験④ CSRF (Cross-Site Request Forgery)</h3>
+    </div>
+    <ol>
+      <li>ショップにログインした状態にする</li>
+      <li>新しいタブで<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">攻撃用サイト（景品当選サイト）</a>を開く</li>
+      <li>「🎁 景品を受け取る」をクリック</li>
+      <li>ショップの<a href="/products/1">商品詳細（Coffee Beans）</a>を確認し、勝手にコメントが投稿されていることを確認</li>
+    </ol>
+    <p class="muted">原因: リクエストが「正しい画面から送られたか」をサーバーが検証していない</p>
+  </div>
 </div>
 
 <%- include("partials/footer") %>

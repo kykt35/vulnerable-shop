@@ -1,56 +1,80 @@
 <%- include("partials/header", { title: "購入（改ざん/CSRF）", currentUser }) %>
 
-<div class="card">
-  <h2>購入</h2>
-  <p><strong><%= product.name %></strong></p>
-  <p class="muted">定価: <%= product.price_yen %> 円</p>
+<div class="section-header">
+  <div class="section-title">
+    <span class="pill">Purchase</span>
+    <h2 style="margin: 0;">購入</h2>
+  </div>
+  <div class="price">定価 <%= product.price_yen %> 円</div>
+</div>
 
-<p class="muted">
-  学習用に、合計金額をフロントで計算しています。<br/>
-  DevToolsで単価や合計を書き換えると、そのまま保存されます。
-</p>
+<div class="two-col">
+  <div class="card stack">
+    <div class="section-title">
+      <h3 style="margin: 0;"><%= product.name %></h3>
+    </div>
+    <form class="stack" method="post" action="/purchase">
+      <input type="hidden" name="product_id" value="<%= product.id %>" />
 
-  <form method="post" action="/purchase">
-    <input type="hidden" name="product_id" value="<%= product.id %>" />
+      <div class="form-field">
+        <label>数量</label>
+        <input name="quantity" type="number" min="1" value="1" />
+      </div>
 
-    <label>数量</label>
-    <input name="quantity" type="number" min="1" value="1" />
+      <!-- Param Tampering 脆弱性: サーバが信用してしまう -->
+      <input type="hidden" name="unit_price_yen" value="<%= product.price_yen %>" />
 
-    <!-- Param Tampering 脆弱性: サーバが信用してしまう -->
-    <input type="hidden" name="unit_price_yen" value="<%= product.price_yen %>" />
+      <div class="form-field">
+        <label>合計（円）</label>
+        <input
+          id="totalYen"
+          name="total_yen"
+          type="number"
+          readonly
+          value="<%= product.price_yen %>"
+          style="background: #f7f7f7; color: #555; cursor: not-allowed;"
+        />
+      </div>
 
-    <label>合計（円）</label>
-    <input
-      id="totalYen"
-      name="total_yen"
-      type="number"
-      readonly
-      value="<%= product.price_yen %>"
-      style="background: #f7f7f7; color: #555; cursor: not-allowed;"
-    />
+      <div class="form-field">
+        <label>メモ（任意）</label>
+        <input name="note" placeholder="例: 置き配希望" />
+      </div>
 
-    <label>メモ（任意）</label>
-    <input name="note" placeholder="例: 置き配希望" />
+      <button type="submit" class="btn btn-primary">購入する</button>
+    </form>
+    <script>
+      (() => {
+        const qty = document.querySelector('input[name="quantity"]');
+        const unitPrice = document.querySelector('input[name="unit_price_yen"]');
+        const total = document.getElementById("totalYen");
+        if (!qty || !unitPrice || !total) return;
+        const update = () => {
+          const q = parseInt(qty.value, 10);
+          const n = Number.isFinite(q) && q > 0 ? q : 1;
+          const u = Number(unitPrice.value);
+          total.value = Number.isFinite(u) ? u * n : n;
+        };
+        qty.addEventListener("input", update);
+        qty.addEventListener("change", update);
+        update();
+      })();
+    </script>
+  </div>
 
-    <button type="submit">購入する</button>
-  </form>
-<script>
-  (() => {
-    const qty = document.querySelector('input[name="quantity"]');
-    const unitPrice = document.querySelector('input[name="unit_price_yen"]');
-    const total = document.getElementById("totalYen");
-    if (!qty || !unitPrice || !total) return;
-    const update = () => {
-      const q = parseInt(qty.value, 10);
-      const n = Number.isFinite(q) && q > 0 ? q : 1;
-      const u = Number(unitPrice.value);
-      total.value = Number.isFinite(u) ? u * n : n;
-    };
-    qty.addEventListener("input", update);
-    qty.addEventListener("change", update);
-    update();
-  })();
-</script>
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">Tampering / CSRF</span>
+      <h3 style="margin: 0;">学習のポイント</h3>
+    </div>
+    <p class="muted" style="margin: 0;">
+      合計金額はフロントで計算し、サーバーは送信値をそのまま保存します。DevToolsで単価や合計を書き換えると、そのまま保存されます。
+    </p>
+    <ul class="muted" style="padding-left: 18px; margin: 8px 0 0;">
+      <li>フォーム値を改ざんして送信すると、サーバー側でチェックされない</li>
+      <li>CSRFでは外部サイトからこのフォームへリクエストが飛ばせてしまう</li>
+    </ul>
+  </div>
 </div>
 
 <%- include("partials/footer") %>

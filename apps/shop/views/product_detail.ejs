@@ -1,30 +1,47 @@
 <%- include("partials/header", { title: product.name, currentUser }) %>
 
-<div class="card">
-  <h2><%= product.name %></h2>
-  <div class="muted"><%= product.price_yen %> 円</div>
-  <p><%= product.description %></p>
-  <p><a href="/purchase/<%= product.id %>">購入へ</a></p>
+<div class="card stack">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="pill">Product</span>
+      <h2 style="margin: 0;"><%= product.name %></h2>
+    </div>
+    <div class="price"><%= product.price_yen %> 円</div>
+  </div>
+  <p style="margin: 0;"><%= product.description %></p>
+  <div class="actions">
+    <a class="btn btn-primary" href="/purchase/<%= product.id %>">購入へ</a>
+    <a class="btn btn-link" href="/products">一覧へ戻る</a>
+  </div>
 </div>
 
-<div class="card">
-  <h3>コメント（XSS）</h3>
-  <p class="muted">学習用に、コメント本文を無エスケープで描画しています。</p>
+<div class="card stack">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="pill">XSS</span>
+      <h3 style="margin: 0;">コメント（学習用に無エスケープで描画）</h3>
+    </div>
+    <div class="muted">スクリプトを挿入するとそのまま実行されます</div>
+  </div>
 
   <% if (!currentUser) { %>
-    <p><a href="/login">ログイン</a>するとコメントできます。</p>
+    <div class="alert">
+      <a href="/login">ログイン</a>するとコメントできます。
+    </div>
   <% } else { %>
-    <form method="post" action="/products/<%= product.id %>/comments">
-      <label>コメント本文</label>
-      <textarea name="body" rows="3" placeholder="<script>alert(1)</script>"></textarea>
-      <button type="submit">投稿</button>
+    <form class="stack" method="post" action="/products/<%= product.id %>/comments">
+      <div class="form-field">
+        <label>コメント本文</label>
+        <textarea name="body" rows="3" placeholder="<script>alert(1)</script>"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">投稿</button>
     </form>
   <% } %>
 
-  <h4>投稿一覧</h4>
+  <h4 style="margin: 12px 0 6px;">投稿一覧</h4>
   <% comments.forEach((c) => { %>
-    <div class="card">
-      <div class="muted"><%= c.created_at %> by <%= c.username %></div>
+    <div class="card stack">
+      <div class="meta"><%= c.created_at %> / <strong><%= c.username %></strong></div>
       <div>
         <!-- XSS脆弱性: 無エスケープ -->
         <%- c.body %>

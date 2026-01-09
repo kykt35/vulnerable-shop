@@ -1,13 +1,44 @@
 <%- include("partials/header", { title: "Home", currentUser }) %>
 
-<div class="card">
-  <h2>ようこそ</h2>
-  <p>これは脆弱性体験用のECサイトです。上部メニューから各体験へ進めます。</p>
-  <ul>
-    <li><a href="/hands-on">Hands-on 手順</a></li>
-    <li><a href="/products">商品一覧</a></li>
-    <li><a href="/search">商品検索（SQL Injection）</a></li>
-  </ul>
+<div class="card hero stack">
+  <div class="pill">Welcome</div>
+  <h1 style="margin: 0;">ようこそ</h1>
+  <p>これは脆弱性体験用のECサイトです。メニューまたは下記ショートカットから各体験へ進めます。</p>
+  <div class="actions">
+    <a class="btn btn-primary" href="/products">商品一覧</a>
+    <a class="btn btn-ghost" href="/hands-on">Hands-on 手順</a>
+    <a class="btn btn-link" href="/search">商品検索（SQLi）</a>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">XSS</span>
+      <h3 style="margin: 0;">クロスサイトスクリプティング体験</h3>
+    </div>
+    <p class="muted">コメント欄や検索結果で、入力が無エスケープのまま出力される挙動を確認できます。</p>
+    <a class="btn btn-link" href="/products/1">サンプル商品へ</a>
+  </div>
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">SQLi</span>
+      <h3 style="margin: 0;">SQLインジェクション体験</h3>
+    </div>
+    <p class="muted">文字列結合で組み立てられたSQLがどのように悪用されるか、ログイン突破や情報漏洩で確認できます。</p>
+    <a class="btn btn-link" href="/search">商品検索へ</a>
+  </div>
+  <div class="card stack">
+    <div class="section-title">
+      <span class="pill">Tampering</span>
+      <h3 style="margin: 0;">パラメータ改ざん・CSRF体験</h3>
+    </div>
+    <p class="muted">購入フォームの値改ざんや、外部サイトからのCSRF攻撃の流れを試せます。</p>
+    <div class="actions">
+      <a class="btn btn-link" href="/purchase/1">購入画面</a>
+      <a class="btn btn-link" href="/hands-on">手順を見る</a>
+    </div>
+  </div>
 </div>
 
 <%- include("partials/footer") %>

@@ -1,19 +1,28 @@
 <%- include("partials/header", { title: "商品検索（SQLi）", currentUser }) %>
 
-<div class="card">
-  <h2>商品検索</h2>
-  <p class="muted">
-    学習用に、検索クエリ <code>q</code> を文字列結合でSQLに埋め込んでいます。
-  </p>
+<div class="section-header">
+  <div class="section-title">
+    <span class="pill">SQL Injection</span>
+    <h2 style="margin: 0;">商品検索</h2>
+  </div>
+  <div class="muted">検索クエリを文字列結合でSQLに埋め込み、挙動を確認できます。</div>
+</div>
 
-  <form method="get" action="/search">
-    <label>検索キーワード</label>
-    <input name="q" value="<%= q || "" %>" placeholder="例: coffee" />
+<div class="card stack">
+  <div class="alert">
+    パラメータ <code>q</code> が無検証でSQLへ結合されます。UNIONやコメント構文を使って任意のデータを取得できます。
+  </div>
+
+  <form class="stack" method="get" action="/search">
+    <div class="form-field">
+      <label>検索キーワード</label>
+      <input name="q" value="<%= q || "" %>" placeholder="例: coffee" />
+    </div>
     <% if (q) { %>
       <!-- 無エスケープで出力することで反射型XSSの挙動を確認可能 -->
-      <div><%- q %></div>
+      <div class="muted">入力値（無エスケープ）: <%- q %></div>
     <% } %>
-    <button type="submit">検索</button>
+    <button type="submit" class="btn btn-primary">検索</button>
   </form>
 
   <% if (sql) { %>
@@ -22,9 +31,14 @@
   <% } %>
 </div>
 
-
 <% if (results) { %>
-  <h3>結果</h3>
+  <div class="section-header" style="margin-top: 6px;">
+    <div class="section-title">
+      <span class="pill">Result</span>
+      <h3 style="margin: 0;">結果</h3>
+    </div>
+    <div class="muted">SQLエラーもそのまま表示されます。</div>
+  </div>
   <table>
     <thead>
       <tr>

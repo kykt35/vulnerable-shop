@@ -8,19 +8,24 @@
   </head>
   <body>
     <div class="container">
-      <header>
-        <div><strong>Vulnerable Shop</strong> <span class="muted">（学習用・本番利用厳禁）</span></div>
-        <nav>
-          <a href="/products">商品一覧</a>
-          <a href="/search">商品検索</a>
-          <a href="/hands-on">Hands-on</a>
-          <a href="/orders">注文履歴</a>
+      <header class="topbar">
+        <div class="brand">
+          <span class="pill">学習用</span>
+          <div>Vulnerable Shop</div>
+          <span class="muted">（本番利用厳禁）</span>
+        </div>
+        <nav class="nav-links">
+          <a class="nav-link" href="/products">商品一覧</a>
+          <a class="nav-link" href="/search">商品検索</a>
+          <a class="nav-link" href="/hands-on">Hands-on</a>
+          <a class="nav-link" href="/orders">注文履歴</a>
           <% if (currentUser) { %>
-            <span class="muted">ログイン中: <%= currentUser.username %></span>
-            <a href="/logout">ログアウト</a>
+            <span class="nav-link muted">ログイン中: <strong><%= currentUser.username %></strong></span>
+            <a class="nav-link primary" href="/logout">ログアウト</a>
           <% } else { %>
-            <a href="/register">登録</a>
-            <a href="/login">ログイン</a>
+            <a class="nav-link" href="/register">登録</a>
+            <a class="nav-link primary" href="/login">ログイン</a>
           <% } %>
         </nav>
       </header>
+      <main class="page">

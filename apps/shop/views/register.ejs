@@ -1,24 +1,38 @@
 <%- include("partials/header", { title: "登録", currentUser }) %>
 
-<div class="card">
-  <h2>ユーザー登録</h2>
+<div class="card stack">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="pill">Auth</span>
+      <h2 style="margin: 0;">ユーザー登録</h2>
+    </div>
+    <div class="muted">入力値はそのまま保存されます。学習用のみ。</div>
+  </div>
+
   <% if (error) { %>
-    <p style="color: #b00020;"><%= error %></p>
+    <div class="alert"><%= error %></div>
   <% } %>
-  <form method="post" action="/register">
-    <label>ユーザー名</label>
-    <input name="username" autocomplete="username" required />
 
-    <label>パスワード</label>
-    <input name="password" type="password" autocomplete="new-password" required />
+  <form class="stack" method="post" action="/register">
+    <div class="form-field">
+      <label>ユーザー名</label>
+      <input name="username" autocomplete="username" required />
+    </div>
 
-    <label>メール（SQLiのUNION例用）</label>
-    <input name="email" type="email" autocomplete="email" required />
+    <div class="form-field">
+      <label>パスワード</label>
+      <input name="password" type="password" autocomplete="new-password" required />
+    </div>
 
-    <button type="submit">登録</button>
+    <div class="form-field">
+      <label>メール（SQLiのUNION例用）</label>
+      <input name="email" type="email" autocomplete="email" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">登録</button>
   </form>
 
-  <p class="muted">※学習のため、パスワードは安全に扱っていません。</p>
+  <p class="muted" style="margin: 0;">※学習のため、パスワードは安全に扱っていません。</p>
 </div>
 
 <%- include("partials/footer") %>

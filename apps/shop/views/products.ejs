@@ -1,16 +1,49 @@
 <%- include("partials/header", { title: "商品一覧", currentUser }) %>
 
-<h2>商品一覧</h2>
-
-<% products.forEach((p) => { %>
-  <div class="card">
-    <div><strong><a href="/products/<%= p.id %>"><%= p.name %></a></strong></div>
-    <div class="muted"><%= p.price_yen %> 円</div>
-    <div><%= p.description %></div>
-    <div style="margin-top: 8px;">
-      <a href="/purchase/<%= p.id %>">購入へ</a>
-    </div>
+<div class="section-header">
+  <div class="section-title">
+    <span class="pill">Products</span>
+    <h2 style="margin: 0;">商品一覧</h2>
   </div>
-<% }) %>
+  <div class="muted">学習用ダミー商品です。リンクから各脆弱性を体験できます。</div>
+</div>
+
+<div class="grid">
+  <% products.forEach((p) => { %>
+    <div
+      class="card product-card stack clickable"
+      role="link"
+      tabindex="0"
+      data-href="/products/<%= p.id %>"
+    >
+      <h3 style="margin: 0;"><%= p.name %></h3>
+      <div class="price"><%= p.price_yen %> 円</div>
+      <p class="muted" style="margin: 4px 0 0;"><%= p.description %></p>
+      <div class="actions">
+        <a class="btn btn-link" href="/products/<%= p.id %>" onclick="event.stopPropagation();">詳細を見る</a>
+        <a class="btn btn-primary" href="/purchase/<%= p.id %>" onclick="event.stopPropagation();">購入へ</a>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<script>
+  (() => {
+    const cards = document.querySelectorAll(".clickable[data-href]");
+    cards.forEach((card) => {
+      const href = card.getAttribute("data-href");
+      if (!href) return;
+      card.addEventListener("click", () => {
+        window.location.href = href;
+      });
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          window.location.href = href;
+        }
+      });
+    });
+  })();
+</script>
 
 <%- include("partials/footer") %>

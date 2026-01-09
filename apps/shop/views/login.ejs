@@ -1,36 +1,49 @@
 <%- include("partials/header", { title: "ログイン", currentUser }) %>
 
-<div class="card">
-  <h2>ログイン</h2>
-  <% if (error) { %>
-    <p style="color: #b00020;"><%= error %></p>
-  <% } %>
-  <form method="post" action="/login">
-    <label>ユーザー名</label>
-    <input name="username" autocomplete="username" required />
+<div class="card stack">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="pill">Auth</span>
+      <h2 style="margin: 0;">ログイン</h2>
+    </div>
+    <div class="muted">脆弱なSQLで検証される例です</div>
+  </div>
 
-    <label>パスワード</label>
-    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; margin-bottom: 10px;">
-      <input
-        id="password"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-        required
-        style="margin: 0; flex: 1;"
-      />
-      <button
-        id="togglePassword"
-        type="button"
-        style="white-space: nowrap;"
-        aria-controls="password"
-        aria-pressed="false"
-      >
-        表示
-      </button>
+  <% if (error) { %>
+    <div class="alert"><%= error %></div>
+  <% } %>
+
+  <form class="stack" method="post" action="/login">
+    <div class="form-field">
+      <label>ユーザー名</label>
+      <input name="username" autocomplete="username" required />
     </div>
 
-    <button type="submit">ログイン</button>
+    <div class="form-field">
+      <label>パスワード</label>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          style="margin: 0; flex: 1;"
+        />
+        <button
+          id="togglePassword"
+          type="button"
+          class="btn btn-ghost"
+          style="white-space: nowrap;"
+          aria-controls="password"
+          aria-pressed="false"
+        >
+          表示
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">ログイン</button>
   </form>
   <script>
     (() => {

@@ -1,22 +1,42 @@
 <%- include("partials/header", { title: "注文履歴", currentUser }) %>
 
-<h2>注文履歴</h2>
+<div class="section-header">
+  <div class="section-title">
+    <span class="pill">Orders</span>
+    <h2 style="margin: 0;">注文履歴</h2>
+  </div>
+  <div class="muted">過去の保存データから挙動を振り返れます。</div>
+</div>
 
 <% if (orders.length === 0) { %>
-  <div class="card">まだ注文がありません。</div>
+  <div class="card">
+    <div class="section-title" style="gap: 6px;">
+      <span class="pill">No Data</span>
+      <div class="muted">まだ注文がありません。</div>
+    </div>
+  </div>
 <% } %>
 
-<% orders.forEach((o) => { %>
-  <div class="card">
-    <div class="muted"><%= o.created_at %></div>
-    <div><strong><%= o.product_name %></strong></div>
-    <div>quantity: <code><%= o.quantity %></code></div>
-      <div>unit_price_yen: <code><%= o.unit_price_yen %></code></div>
-      <div>total_yen: <code><%= o.total_yen %></code></div>
-    <% if (o.note) { %>
-      <div class="muted">note: <%= o.note %></div>
-    <% } %>
-  </div>
-<% }) %>
+<div class="stack">
+  <% orders.forEach((o) => { %>
+    <div class="card stack">
+      <div class="meta"><%= o.created_at %></div>
+      <div class="section-header">
+        <div class="section-title">
+          <h3 style="margin: 0;"><%= o.product_name %></h3>
+        </div>
+        <div class="price">合計 <%= o.total_yen %> 円</div>
+      </div>
+      <div class="actions" style="gap: 6px; flex-wrap: wrap;">
+        <span class="badge">quantity: <code><%= o.quantity %></code></span>
+        <span class="badge">unit_price_yen: <code><%= o.unit_price_yen %></code></span>
+        <span class="badge">total_yen: <code><%= o.total_yen %></code></span>
+      </div>
+      <% if (o.note) { %>
+        <div class="muted">note: <%= o.note %></div>
+      <% } %>
+    </div>
+  <% }) %>
+</div>
 
 <%- include("partials/footer") %>

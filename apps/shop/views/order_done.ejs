@@ -1,16 +1,25 @@
 <%- include("partials/header", { title: "購入完了", currentUser }) %>
 
-<div class="card">
-  <h2>購入完了</h2>
-  <p>注文を保存しました。</p>
-  <ul>
-    <li>order_id: <code><%= order.id %></code></li>
-    <li>product_id: <code><%= order.product_id %></code></li>
-    <li>quantity: <code><%= order.quantity %></code></li>
-    <li>unit_price_yen: <code><%= order.unit_price_yen %></code></li>
-    <li>total_yen: <code><%= order.total_yen %></code></li>
-  </ul>
-  <p><a href="/orders">注文履歴を見る</a></p>
+<div class="card stack">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="pill">Order</span>
+      <h2 style="margin: 0;">購入完了</h2>
+    </div>
+    <div class="price">支払合計 <%= order.total_yen %> 円</div>
+  </div>
+  <p style="margin: 0;">注文を保存しました。</p>
+  <div class="actions" style="gap: 10px; flex-wrap: wrap;">
+    <span class="badge">order_id: <code><%= order.id %></code></span>
+    <span class="badge">product_id: <code><%= order.product_id %></code></span>
+    <span class="badge">quantity: <code><%= order.quantity %></code></span>
+    <span class="badge">unit_price_yen: <code><%= order.unit_price_yen %></code></span>
+    <span class="badge">total_yen: <code><%= order.total_yen %></code></span>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/orders">注文履歴を見る</a>
+    <a class="btn btn-link" href="/products">商品一覧へ</a>
+  </div>
 </div>
 
 <%- include("partials/footer") %>
