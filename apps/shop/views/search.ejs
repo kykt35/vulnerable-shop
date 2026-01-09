@@ -1,7 +1,7 @@
 <%- include("partials/header", { title: "商品検索（SQLi）", currentUser }) %>
 
 <div class="card">
-  <h2>商品検索（SQL Injection）</h2>
+  <h2>商品検索</h2>
   <p class="muted">
     学習用に、検索クエリ <code>q</code> を文字列結合でSQLに埋め込んでいます。
   </p>
@@ -9,6 +9,10 @@
   <form method="get" action="/search">
     <label>検索キーワード</label>
     <input name="q" value="<%= q || "" %>" placeholder="例: coffee" />
+    <% if (q) { %>
+      <!-- 無エスケープで出力することで反射型XSSの挙動を確認可能 -->
+      <div><%- q %></div>
+    <% } %>
     <button type="submit">検索</button>
   </form>
 
@@ -17,6 +21,7 @@
     <pre><code><%= sql %></code></pre>
   <% } %>
 </div>
+
 
 <% if (results) { %>
   <h3>結果</h3>
