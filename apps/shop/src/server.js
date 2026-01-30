@@ -141,7 +141,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/hands-on", (req, res) => {
-  res.render("hands_on", { currentUser: res.locals.currentUser, attackerUrl: ATTACKER_URL });
+  res.render("hands_on", { currentUser: res.locals.currentUser, attackerUrl: ATTACKER_URL + "/csrf" });
 });
 
 app.get("/register", (req, res) => {
@@ -231,6 +231,20 @@ app.post("/products/:id/comments", requireLogin, (req, res) => {
   if (!product) return res.status(404).send("Not Found");
 
   const body = req.body.body || "";
+  db.prepare(
+    "INSERT INTO comments (product_id, user_id, body, created_at) VALUES (?, ?, ?, ?)"
+  ).run(product.id, req.session.userId, body, nowIso());
+
+  res.redirect(`/products/${product.id}`);
+});
+
+// CSRF体験用: Laxでも動作するGET経由のコメント投稿（意図的に危険）
+app.get("/csrf-comment", requireLogin, (req, res) => {
+  const productId = Number(req.query.product_id || 1);
+  const product = db.prepare("SELECT * FROM products WHERE id = ?").get(productId);
+  if (!product) return res.status(404).send("Not Found");
+
+  const body = String(req.query.body || "");
   db.prepare(
     "INSERT INTO comments (product_id, user_id, body, created_at) VALUES (?, ?, ?, ?)"
   ).run(product.id, req.session.userId, body, nowIso());
