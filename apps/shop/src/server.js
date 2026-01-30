@@ -141,7 +141,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/hands-on", (req, res) => {
-  res.render("hands_on", { currentUser: res.locals.currentUser, attackerUrl: ATTACKER_URL });
+  res.render("hands_on", { currentUser: res.locals.currentUser, attackerUrl: ATTACKER_URL + "/csrf" });
 });
 
 app.get("/register", (req, res) => {

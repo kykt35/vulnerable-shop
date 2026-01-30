@@ -27,6 +27,11 @@ function renderPage(filename) {
 </html>`;
 }
 
+app.get("/csrf", (req, res) => {
+  res.setHeader("content-type", "text/html; charset=utf-8");
+  res.send(renderPage("csrf.html"));
+});
+
 app.get("/", (req, res) => {
   res.setHeader("content-type", "text/html; charset=utf-8");
   res.send(renderPage("index.html"));
