@@ -113,7 +113,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       // CSRF体験が確実にできるよう、GETで購入できる学習用エンドポイントも別途用意する
-      sameSite: "lax"
+      sameSite: "lax",
+      // XSS体験用：JavaScriptからセッションIDを読めるようにする（本番では true 推奨）
+      httpOnly: false
     }
   })
 );
