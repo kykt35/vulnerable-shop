@@ -22,7 +22,9 @@
       <!-- 無エスケープで出力することで反射型XSSの挙動を確認可能 -->
       <div class="muted">入力値（無エスケープ）: <%- q %></div>
     <% } %>
-    <button type="submit" class="btn btn-primary">検索</button>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">検索</button>
+    </div>
   </form>
 
   <% if (sql) { %>
