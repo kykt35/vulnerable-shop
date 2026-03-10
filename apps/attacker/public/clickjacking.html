@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attacker Site (Clickjacking Demo)</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top, rgba(255, 214, 112, 0.2), transparent 32%),
+          linear-gradient(180deg, #2a1208 0%, #130b09 50%, #080808 100%);
+        color: #fff5dd;
+      }
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 36px 20px 72px;
+      }
+      .hero {
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 224, 148, 0.16);
+        background: linear-gradient(140deg, rgba(255, 255, 255, 0.08), rgba(255, 160, 60, 0.05));
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+      }
+      .hero-head {
+        padding: 28px 32px 0;
+      }
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255, 208, 76, 0.18);
+        color: #ffd977;
+        letter-spacing: 0.1em;
+        font-size: 12px;
+      }
+      h1 {
+        margin: 16px 0 10px;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 0.95;
+      }
+      .lead {
+        margin: 0;
+        max-width: 760px;
+        color: #eedfc1;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
+        gap: 24px;
+        padding: 28px 32px 32px;
+      }
+      .stage-card,
+      .explain-card {
+        border-radius: 24px;
+        background: rgba(10, 10, 12, 0.34);
+        border: 1px solid rgba(255, 232, 173, 0.12);
+      }
+      .stage-card {
+        padding: 22px;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .toggle-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 14px;
+      }
+      .toggle-row button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff2ce;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .swatch {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+      }
+      .swatch-real {
+        background: #6dd3ff;
+      }
+      .swatch-fake {
+        background: #ffbf47;
+      }
+      .demo-frame {
+        position: relative;
+        height: 650px;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #0d1016;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+      .shop-frame {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #fff;
+      }
+      .overlay-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: rgba(255, 255, 255, 0.85);
+      }
+      .overlay-layer.is-hidden {
+        display: none;
+      }
+      .overlay-tag {
+        position: absolute;
+        left: 18px;
+        top: 18px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 191, 71, 0.92);
+        color: #3d1806;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      }
+      .overlay-panel {
+        position: absolute;
+        left: 24px;
+        top: 88px;
+        width: min(460px, calc(100% - 48px));
+        padding: 24px 24px 34px;
+        border-radius: 24px;
+        background: linear-gradient(140deg, rgba(255, 161, 56, 0.92), rgba(237, 74, 55, 0.92));
+        color: #fffdf5;
+        box-shadow: 0 24px 60px rgba(86, 23, 8, 0.35);
+        backdrop-filter: blur(8px);
+      }
+      .overlay-panel h2 {
+        margin: 0 0 10px;
+        font-size: 34px;
+        line-height: 1;
+      }
+      .overlay-panel p {
+        margin: 0;
+        line-height: 1.6;
+        color: rgba(255, 248, 236, 0.94);
+      }
+      .decoy-cta {
+        position: absolute;
+        left: 50px;
+        top: 515px;
+        width: 300px;
+        height: 62px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #fffef6;
+        background:
+          linear-gradient(160deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08)),
+          linear-gradient(135deg, #ffd041, #ff9825);
+        box-shadow: 0 20px 44px rgba(96, 23, 7, 0.36);
+      }
+      .target-callout {
+        position: absolute;
+        left: 34px;
+        top: 494px;
+        width: 332px;
+        height: 104px;
+        border: 2px dashed rgba(255, 245, 214, 0.95);
+        border-radius: 26px;
+        box-shadow: 0 0 0 999px rgba(12, 10, 9, 0.08);
+      }
+      .callout-label {
+        position: absolute;
+        left: 372px;
+        top: 510px;
+        max-width: 210px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(18, 14, 12, 0.78);
+        border: 1px solid rgba(255, 228, 163, 0.24);
+        color: #fff1cb;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .explain-card {
+        padding: 22px 22px 18px;
+      }
+      .explain-card h3 {
+        margin: 0 0 14px;
+        font-size: 22px;
+      }
+      .compare {
+        display: grid;
+        gap: 12px;
+      }
+      .compare-row {
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .compare-row strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #ffe5aa;
+      }
+      .steps {
+        margin: 16px 0 0;
+        padding-left: 18px;
+        color: #e7d6b3;
+      }
+      .steps li {
+        margin-bottom: 8px;
+      }
+      .debug {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 227, 150, 0.12);
+        color: #d8c5a0;
+        font-size: 14px;
+      }
+      code {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      @media (max-width: 960px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .hero-head,
+        .hero-grid {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        .stage-card {
+          padding: 16px;
+        }
+        .demo-frame {
+          height: 620px;
+        }
+        .overlay-panel {
+          left: 18px;
+          top: 70px;
+          width: calc(100% - 36px);
+          padding: 18px 18px 26px;
+        }
+        .overlay-panel h2 {
+          font-size: 28px;
+        }
+        .decoy-cta {
+          left: 26px;
+          right: 26px;
+          width: auto;
+          top: 518px;
+          font-size: 22px;
+        }
+        .target-callout {
+          left: 12px;
+          right: 12px;
+          width: auto;
+          top: 496px;
+        }
+        .callout-label {
+          left: 20px;
+          right: 20px;
+          top: 432px;
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-head">
+          <span class="eyebrow">Clickjacking Demo</span>
+          <h1>本物の Shop を見せたまま、<br />その上に偽UIを重ねる</h1>
+          <p class="lead">
+            下に見えているのは iframe で埋め込まれた本物の Shop 画面です。上に載っているオレンジのUIは攻撃者が重ねた偽物で、被害者のクリックは背後の本物のボタンへ届きます。
+          </p>
+        </div>
+
+        <div class="hero-grid">
+          <section class="stage-card">
+            <div class="legend">
+              <div class="chip"><span class="swatch swatch-real"></span> 下層: 本物の Shop 画面</div>
+              <div class="chip"><span class="swatch swatch-fake"></span> 上層: 攻撃者が重ねた偽 UI</div>
+            </div>
+            <div class="toggle-row">
+              <button id="overlayToggle" type="button">上層を隠す</button>
+            </div>
+
+            <div class="demo-frame">
+              <iframe
+                class="shop-frame"
+                id="trapFrame"
+                title="embedded real shop purchase page"
+                loading="eager"
+              ></iframe>
+
+              <div class="overlay-layer" id="overlayLayer">
+                <div class="overlay-tag">偽UIレイヤー</div>
+                <div class="overlay-panel">
+                  <h2>限定プレゼント</h2>
+                  <p>
+                    ここは応募ページに見えますが、下には本物の EC サイトが表示されています。重ねたボタン位置をクリックすると、実際には Shop の購入ボタンが押されます。
+                  </p>
+                </div>
+                <div class="target-callout" aria-hidden="true"></div>
+                <div class="decoy-cta" aria-hidden="true">景品を受け取る</div>
+                <div class="callout-label">
+                  この枠内では、偽の「景品ボタン」が本物の Shop の「購入する」上に重なっています。
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="explain-card">
+            <h3>何が起きているか</h3>
+            <div class="compare">
+              <div class="compare-row">
+                <strong>CSRF</strong>
+                攻撃者が被害者ブラウザから勝手にリクエストを送ります。正規サイトの画面は見えていません。
+              </div>
+              <div class="compare-row">
+                <strong>Clickjacking</strong>
+                本物のサイトを iframe で表示したまま、その上に偽 UI を重ねます。被害者はだまされて本物の UI を押します。
+              </div>
+            </div>
+
+            <ol class="steps">
+              <li>Shop で <code>alice / password123</code> でログインする</li>
+              <li>このページを開き、下に本物の Shop 画面が見えていることを確認する</li>
+              <li>オレンジの「景品を受け取る」位置をクリックする</li>
+              <li>Shop の <code>/orders</code> を開き、注文が増えていることを確認する</li>
+            </ol>
+
+            <div class="debug">
+              <p style="margin-top: 0;"><strong>【学習用デバッグ表示】</strong></p>
+              <p>埋め込み先: <code id="targetPath"></code></p>
+              <p>このページ自体は <code>/purchase</code> に直接 POST しません。クリック先は iframe 内の Shop です。</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const clickjackingTarget =
+        window.__CLICKJACKING_TARGET__ || new URL("/purchase/1", window.__TARGET_BASE__).toString();
+      const frame = document.getElementById("trapFrame");
+      const targetPath = document.getElementById("targetPath");
+      const overlayLayer = document.getElementById("overlayLayer");
+      const overlayToggle = document.getElementById("overlayToggle");
+      if (frame) {
+        frame.src = clickjackingTarget;
+      }
+      if (targetPath) {
+        targetPath.textContent = clickjackingTarget;
+      }
+      if (overlayLayer && overlayToggle) {
+        overlayToggle.addEventListener("click", () => {
+          overlayLayer.classList.toggle("is-hidden");
+          overlayToggle.textContent = overlayLayer.classList.contains("is-hidden")
+            ? "上層を表示する"
+            : "上層を隠す";
+        });
+      }
+    </script>
+  </body>
+</html>

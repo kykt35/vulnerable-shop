@@ -49,7 +49,8 @@ docker compose up
 ### Attacker
 
 - `PORT`（既定: 9000）
-- `TARGET_BASE`（既定: `http://localhost:8000`。攻撃対象のShop URL）
+- `TARGET_BASE`（既定: `http://localhost:8000`。ブラウザから見える Shop URL）
+- `TARGET_INTERNAL_BASE`（既定: `TARGET_BASE` と同じ。Attacker サーバーが中継で使う Shop URL。Docker Compose では `http://shop:8000`）
 
 ## 体験に使う導線（概要）
 
@@ -59,6 +60,9 @@ docker compose up
 - **セッションハイジャック**:
   - `httpOnly: false` のセッションCookieを、保存型XSSから `document.cookie` で盗める
   - Attacker の `/session-hijack` で stolen cookie を確認し、`/orders` へ再利用できる
+- **クリックジャッキング**:
+  - Shop がフレーム埋め込みを禁止していないため、Attacker の `/clickjacking` から `/purchase/1` を iframe で重ねられる
+  - CSRF のように攻撃者が直接 POST するのではなく、被害者自身に Shop の本物の購入ボタンを押させられる
 - **SQL Injection**:
   - `/login` のユーザー名/パスワードが文字列結合SQL
   - `/search` の `q` が文字列結合SQL（UNION/コメント構文が有効）
@@ -71,6 +75,17 @@ docker compose up
   - Attacker の `/auto-purchase` で購入リクエストを自動送信
 
 詳しい手順は起動後に画面内の「Hands-on」リンクを参照してください（Shop側に手順を表示します）。
+
+## クリックジャッキングの再現手順
+
+1. `alice / password123` で Shop にログインする
+2. `http://localhost:9000/clickjacking` を開く
+3. 「本物の Shop 画面を表示する」を押し、背後に `/purchase/1` の実画面が埋め込まれていることを確認する
+4. 「隠してもう一度試す」で戻し、表示された「景品を受け取る」位置をクリックする
+5. `http://localhost:8000/orders` を開く
+6. 自分では Shop の購入画面を操作していないのに、注文が 1 件追加されていることを確認する
+
+このシナリオでは、攻撃者ページが `/purchase` に直接リクエストしているわけではありません。被害者のクリックが iframe 内の本物の Shop UI に到達している点が CSRF との違いです。
 
 ## セッションハイジャックの再現手順
 

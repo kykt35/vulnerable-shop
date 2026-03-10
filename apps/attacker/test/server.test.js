@@ -87,6 +87,23 @@ async function testTopPageShowsSessionHijackEntry() {
     assert.strictEqual(response.statusCode, 200);
     assert(response.body.includes("セッションハイジャック"));
     assert(response.body.includes("/session-hijack"));
+    assert(response.body.includes("クリックジャッキング"));
+    assert(response.body.includes("/clickjacking"));
+  });
+}
+
+async function testClickjackingPageShowsEmbeddedPurchaseTarget() {
+  await withServer(async (port) => {
+    const response = await makeRequest(port, "/clickjacking");
+    assert.strictEqual(response.statusCode, 200);
+    assert(response.body.includes("Clickjacking Demo"));
+    assert(response.body.includes("本物の Shop を見せたまま"));
+    assert(response.body.includes("偽UIレイヤー"));
+    assert(response.body.includes("本物の Shop 画面"));
+    assert(
+      response.body.includes("http://localhost:8000/purchase/1") ||
+        response.body.includes("http:\\/\\/localhost:8000\\/purchase\\/1")
+    );
   });
 }
 
@@ -159,6 +176,7 @@ async function testReplayFlow() {
 
 async function run() {
   await testTopPageShowsSessionHijackEntry();
+  await testClickjackingPageShowsEmbeddedPurchaseTarget();
   await testCollectAndSessionHijackPageShowStolenCookie();
   await testReplayFlow();
 }

