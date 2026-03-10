@@ -10,6 +10,8 @@ const DEFAULT_SESSION_SECRET = process.env.SESSION_SECRET || "dev-secret";
 const DEFAULT_DATABASE_PATH =
   process.env.DATABASE_PATH || path.join(__dirname, "..", "data", "shop.db");
 const DEFAULT_ATTACKER_URL = process.env.ATTACKER_URL || "http://localhost:5000";
+const DEFAULT_FILES_ROOT =
+  process.env.FILES_ROOT || path.join(__dirname, "..", "files");
 
 function openDb(databasePath) {
   const dir = path.dirname(databasePath);
@@ -52,6 +54,7 @@ function initDb(db) {
       product_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
       body TEXT NOT NULL,
+      image_path TEXT,
       created_at TEXT NOT NULL,
       FOREIGN KEY(product_id) REFERENCES products(id),
       FOREIGN KEY(user_id) REFERENCES users(id)
@@ -95,18 +98,26 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function ensureDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
 function createApp(options) {
   const config = Object.assign(
     {
       sessionSecret: DEFAULT_SESSION_SECRET,
       databasePath: DEFAULT_DATABASE_PATH,
       attackerUrl: DEFAULT_ATTACKER_URL,
+      filesRoot: DEFAULT_FILES_ROOT,
       logger: morgan("dev")
     },
     options || {}
   );
 
   const db = config.db || openDb(config.databasePath);
+  ensureDir(config.filesRoot);
   if (!config.skipInitDb) {
     initDb(db);
   }
@@ -231,7 +242,7 @@ function createApp(options) {
     const comments = db
       .prepare(
         `
-        SELECT c.id, c.body, c.created_at, u.username
+        SELECT c.id, c.body, c.image_path, c.created_at, u.username
         FROM comments c
         JOIN users u ON u.id = c.user_id
         WHERE c.product_id = ?
@@ -256,11 +267,29 @@ function createApp(options) {
     }
 
     const body = req.body.body || "";
+    const imagePath = req.body.image_path || "";
     db.prepare(
-      "INSERT INTO comments (product_id, user_id, body, created_at) VALUES (?, ?, ?, ?)"
-    ).run(product.id, req.session.userId, body, nowIso());
+      "INSERT INTO comments (product_id, user_id, body, image_path, created_at) VALUES (?, ?, ?, ?, ?)"
+    ).run(product.id, req.session.userId, body, imagePath, nowIso());
 
     res.redirect("/products/" + product.id);
+  });
+
+  app.get("/comment-images/:commentId", (req, res) => {
+    const comment = db
+      .prepare("SELECT id, image_path FROM comments WHERE id = ?")
+      .get(req.params.commentId);
+    if (!comment || !comment.image_path) {
+      return res.status(404).send("Not Found");
+    }
+
+    // Directory traversal vulnerability: stored path is trusted as-is.
+    const filePath = path.join(config.filesRoot, comment.image_path);
+    res.sendFile(filePath, (error) => {
+      if (error && !res.headersSent) {
+        res.status(error.statusCode || 404).send("Not Found");
+      }
+    });
   });
 
   app.get("/search", (req, res) => {
