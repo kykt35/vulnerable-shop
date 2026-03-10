@@ -108,6 +108,7 @@
           <p>被害者が XSS を踏むと、直近の値がここに表示されます。</p>
           <div id="stolenCookie" class="cookie-box">まだ Cookie は盗まれていません。</div>
           <div class="muted">受信先: <code>/collect?cookie=...</code></div>
+          <a class="btn" href="/replay?path=%2Forders">盗んだセッションで注文履歴を見る</a>
         </section>
 
         <section class="card">
@@ -117,6 +118,7 @@
             <li>商品コメントへ Cookie 送信用の XSS を投稿する</li>
             <li>商品詳細を再表示し、Attacker 側へ Cookie が送られる</li>
             <li>この画面で stolen cookie を確認する</li>
+            <li>上のボタンで <code>/orders</code> を開き、被害者の注文履歴を閲覧できることを確認する</li>
           </ol>
           <a class="btn" href="/">攻撃者ポータルへ戻る</a>
         </section>
