@@ -111,7 +111,7 @@ async function run() {
       },
       body: {
         body: "read source",
-        image_path: "../../src/server.js"
+        image_path: "../src/server.js"
       }
     });
     assert.strictEqual(traversalResponse.statusCode, 302);
@@ -147,6 +147,18 @@ async function run() {
     assert.strictEqual(xssResponse.statusCode, 200);
     assert.notStrictEqual(
       xssResponse.body.indexOf(Buffer.from("<script>alert('xss')</script>")),
+      -1
+    );
+
+    const handsOnResponse = await sendRequest(started.server, {
+      path: "/hands-on",
+      headers: {
+        cookie: cookie
+      }
+    });
+    assert.strictEqual(handsOnResponse.statusCode, 200);
+    assert.notStrictEqual(
+      handsOnResponse.body.indexOf(Buffer.from("体験⑤ ディレクトリ・トラバーサル")),
       -1
     );
   } finally {
