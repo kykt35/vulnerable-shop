@@ -97,9 +97,9 @@ async function testClickjackingPageShowsEmbeddedPurchaseTarget() {
     const response = await makeRequest(port, "/clickjacking");
     assert.strictEqual(response.statusCode, 200);
     assert(response.body.includes("Clickjacking Demo"));
-    assert(response.body.includes("本物の Shop 画面を表示する"));
-    assert(response.body.includes("このページ自身は"));
-    assert(response.body.includes("本物の UI"));
+    assert(response.body.includes("本物の Shop を見せたまま"));
+    assert(response.body.includes("偽UIレイヤー"));
+    assert(response.body.includes("本物の Shop 画面"));
     assert(
       response.body.includes("http://localhost:8000/purchase/1") ||
         response.body.includes("http:\\/\\/localhost:8000\\/purchase\\/1")
