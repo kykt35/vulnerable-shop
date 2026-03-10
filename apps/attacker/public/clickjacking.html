@@ -11,23 +11,24 @@
         min-height: 100vh;
         font-family: Georgia, "Times New Roman", serif;
         background:
-          radial-gradient(circle at top, rgba(255, 214, 10, 0.25), transparent 40%),
-          linear-gradient(180deg, #2d1208 0%, #140b07 50%, #070707 100%);
-        color: #fff9e6;
+          radial-gradient(circle at top, rgba(255, 210, 90, 0.22), transparent 35%),
+          linear-gradient(180deg, #2b1208 0%, #120b09 50%, #070707 100%);
+        color: #fff6df;
       }
       .shell {
-        max-width: 980px;
+        max-width: 1120px;
         margin: 0 auto;
-        padding: 48px 20px 72px;
+        padding: 40px 20px 72px;
       }
       .hero {
-        position: relative;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 224, 150, 0.18);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 170, 70, 0.04));
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
         overflow: hidden;
-        border-radius: 24px;
-        border: 1px solid rgba(255, 220, 120, 0.25);
-        background: linear-gradient(135deg, rgba(255, 244, 202, 0.12), rgba(255, 177, 66, 0.06));
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
-        padding: 36px;
+      }
+      .hero-head {
+        padding: 28px 32px 0;
       }
       .eyebrow {
         display: inline-block;
@@ -39,62 +40,171 @@
         font-size: 12px;
       }
       h1 {
-        margin: 16px 0 12px;
-        font-size: clamp(36px, 7vw, 64px);
-        line-height: 0.95;
+        margin: 16px 0 10px;
+        font-size: clamp(34px, 5vw, 60px);
+        line-height: 0.96;
       }
       .lead {
-        max-width: 560px;
         margin: 0;
-        color: #f2dfc5;
+        max-width: 720px;
+        color: #f0dfc1;
         font-size: 18px;
         line-height: 1.6;
       }
-      .stage {
-        position: relative;
-        margin-top: 32px;
-        width: min(100%, 580px);
-        height: 220px;
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+        gap: 24px;
+        padding: 28px 32px 32px;
       }
-      .bait {
+      .stage-card,
+      .explain-card {
+        border-radius: 24px;
+        background: rgba(9, 9, 11, 0.36);
+        border: 1px solid rgba(255, 232, 173, 0.12);
+      }
+      .stage-card {
+        padding: 22px;
+      }
+      .fake-surface {
+        position: relative;
+        height: 420px;
+        border-radius: 22px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 30%),
+          linear-gradient(135deg, #ff932f, #ef4637 58%, #80220f 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      }
+      .promo-copy {
         position: absolute;
         inset: 0;
+        padding: 34px 30px;
+      }
+      .promo-copy h2 {
+        margin: 0 0 10px;
+        font-size: 34px;
+      }
+      .promo-copy p {
+        max-width: 380px;
+        margin: 0;
+        line-height: 1.6;
+        color: rgba(255, 248, 233, 0.96);
+      }
+      .decoy-button {
+        position: absolute;
+        left: 30px;
+        top: 212px;
+        width: 320px;
+        height: 68px;
+        border-radius: 999px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 24px;
-        background:
-          linear-gradient(160deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
-          linear-gradient(135deg, #ff8e2b, #ff3f34);
-        color: #fffef6;
-        font-size: 34px;
+        font-size: 28px;
         font-weight: 700;
         letter-spacing: 0.06em;
-        box-shadow: 0 18px 50px rgba(255, 80, 45, 0.35);
-        text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
+        color: #fffef5;
+        background:
+          linear-gradient(160deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04)),
+          linear-gradient(135deg, #ffd041, #ff8f1f);
+        box-shadow: 0 20px 45px rgba(94, 17, 5, 0.32);
+        pointer-events: none;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
       }
-      .hint {
+      .spotlight {
         position: absolute;
-        left: 24px;
-        right: 24px;
-        bottom: 18px;
-        color: rgba(255, 245, 214, 0.92);
-        font-size: 14px;
+        left: 22px;
+        top: 198px;
+        width: 336px;
+        height: 96px;
+        border: 2px dashed rgba(255, 250, 230, 0.9);
+        border-radius: 24px;
+        box-shadow: 0 0 0 999px rgba(15, 9, 7, 0.2);
+        pointer-events: none;
+      }
+      .frame-wrap {
+        position: absolute;
+        inset: 0;
       }
       .trap-frame {
         position: absolute;
-        top: -202px;
-        left: -1px;
-        width: 640px;
-        height: 560px;
+        top: -72px;
+        left: -22px;
+        width: 760px;
+        height: 760px;
         border: 0;
-        opacity: 0.02;
+        opacity: 0.03;
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+      .fake-surface.revealed .trap-frame {
+        opacity: 0.96;
+      }
+      .fake-surface.revealed .decoy-button,
+      .fake-surface.revealed .spotlight {
+        opacity: 0.18;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .toolbar button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .toolbar .secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff2ce;
+      }
+      .toolbar .primary {
+        background: linear-gradient(135deg, #ffd041, #ff932f);
+        color: #381705;
+      }
+      .status {
+        margin-top: 14px;
+        color: #e9d8b6;
+        font-size: 14px;
+      }
+      .explain-card {
+        padding: 22px 22px 18px;
+      }
+      .explain-card h3 {
+        margin: 0 0 14px;
+        font-size: 22px;
+      }
+      .compare {
+        display: grid;
+        gap: 12px;
+      }
+      .compare-row {
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .compare-row strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #ffe5aa;
+      }
+      .steps {
+        margin: 16px 0 0;
+        padding-left: 18px;
+        color: #e7d6b3;
+      }
+      .steps li {
+        margin-bottom: 8px;
       }
       .debug {
-        margin-top: 28px;
-        border-top: 1px solid rgba(255, 223, 145, 0.18);
-        padding-top: 20px;
-        color: #dcccb0;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 227, 150, 0.12);
+        color: #d8c5a0;
         font-size: 14px;
       }
       code {
@@ -102,28 +212,43 @@
         padding: 2px 6px;
         border-radius: 6px;
       }
-      .steps {
-        margin-top: 10px;
-        padding-left: 18px;
-      }
-      .steps li {
-        margin-bottom: 6px;
+      @media (max-width: 920px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
       }
       @media (max-width: 720px) {
-        .hero {
-          padding: 24px;
+        .hero-head,
+        .hero-grid {
+          padding-left: 20px;
+          padding-right: 20px;
         }
-        .stage {
-          height: 180px;
+        .stage-card {
+          padding: 16px;
         }
-        .bait {
-          font-size: 26px;
-          text-align: center;
-          padding: 0 24px;
+        .fake-surface {
+          height: 460px;
+        }
+        .promo-copy {
+          padding: 24px 20px;
+        }
+        .promo-copy h2 {
+          font-size: 28px;
+        }
+        .decoy-button {
+          left: 20px;
+          width: calc(100% - 40px);
+          top: 232px;
+          font-size: 24px;
+        }
+        .spotlight {
+          left: 14px;
+          top: 218px;
+          width: calc(100% - 28px);
         }
         .trap-frame {
-          top: -218px;
-          left: -54px;
+          top: -58px;
+          left: -110px;
           transform: scale(0.92);
           transform-origin: top left;
         }
@@ -133,31 +258,73 @@
   <body>
     <main class="shell">
       <section class="hero">
-        <span class="eyebrow">Clickjacking Demo</span>
-        <h1>限定特典を受け取る</h1>
-        <p class="lead">
-          派手なボタンに見せかけつつ、背後では別サイトの購入ボタンを押させるデモです。被害者には正規の購入画面がほぼ見えません。
-        </p>
-
-        <div class="stage">
-          <div class="bait" aria-hidden="true">景品を受け取る</div>
-          <div class="hint">1回クリックすると、見えない iframe 上の購入ボタンが押されます。</div>
-          <iframe
-            class="trap-frame"
-            id="trapFrame"
-            title="hidden purchase frame"
-            loading="eager"
-          ></iframe>
+        <div class="hero-head">
+          <span class="eyebrow">Clickjacking Demo</span>
+          <h1>これは CSRF ではなく、<br />本物の Shop 画面を押させるデモです</h1>
+          <p class="lead">
+            このページ自身は <code>/purchase</code> に直接 POST しません。背後に埋め込んだ
+            <code>/purchase/1</code> の本物の「購入する」を、被害者のクリックで押させます。
+          </p>
         </div>
 
-        <div class="debug">
-          <p style="margin-top: 0;"><strong>【学習用デバッグ表示】</strong></p>
-          <p>埋め込み先: <code id="targetPath"></code></p>
-          <ol class="steps">
-            <li>被害者として Shop にログインしておく</li>
-            <li>このページで「景品を受け取る」位置をクリックする</li>
-            <li>Shop の <code>/orders</code> を開いて注文追加を確認する</li>
-          </ol>
+        <div class="hero-grid">
+          <section class="stage-card">
+            <div class="fake-surface" id="fakeSurface">
+              <div class="promo-copy">
+                <h2>限定キャンペーン</h2>
+                <p>
+                  表向きはプレゼント応募ページに見せていますが、実際のクリック先は埋め込まれた
+                  Shop の購入ボタンです。
+                </p>
+              </div>
+              <div class="frame-wrap">
+                <iframe
+                  class="trap-frame"
+                  id="trapFrame"
+                  title="embedded real shop purchase page"
+                  loading="eager"
+                ></iframe>
+              </div>
+              <div class="decoy-button" aria-hidden="true">景品を受け取る</div>
+              <div class="spotlight" aria-hidden="true"></div>
+            </div>
+
+            <div class="toolbar">
+              <button class="secondary" id="revealButton" type="button">本物の Shop 画面を表示する</button>
+              <button class="primary" id="resetButton" type="button">隠してもう一度試す</button>
+            </div>
+            <div class="status" id="statusText">
+              いま見えている大きなボタンの位置に、Shop の本物の「購入する」が重なっています。
+            </div>
+          </section>
+
+          <aside class="explain-card">
+            <h3>CSRF との違い</h3>
+            <div class="compare">
+              <div class="compare-row">
+                <strong>CSRF</strong>
+                攻撃者ページが被害者ブラウザから勝手にリクエストを送ります。被害者は正規サイトの画面を押していません。
+              </div>
+              <div class="compare-row">
+                <strong>Clickjacking</strong>
+                攻撃者ページが正規サイトを iframe で埋め込み、被害者自身に本物の UI を押させます。
+              </div>
+            </div>
+
+            <ol class="steps">
+              <li>Shop で <code>alice / password123</code> でログインする</li>
+              <li>まずは「本物の Shop 画面を表示する」を押して、背後に <code>/purchase/1</code> があることを見る</li>
+              <li>「隠してもう一度試す」で元に戻す</li>
+              <li>大きな「景品を受け取る」位置をクリックする</li>
+              <li>Shop の <code>/orders</code> で注文が増えていることを確認する</li>
+            </ol>
+
+            <div class="debug">
+              <p style="margin-top: 0;"><strong>【学習用デバッグ表示】</strong></p>
+              <p>埋め込み先: <code id="targetPath"></code></p>
+              <p>ポイント: このページ内に <code>form.submit()</code> はなく、クリック先は iframe 内の Shop です。</p>
+            </div>
+          </aside>
         </div>
       </section>
     </main>
@@ -167,11 +334,30 @@
         window.__CLICKJACKING_TARGET__ || new URL("/purchase/1", window.__TARGET_BASE__).toString();
       const frame = document.getElementById("trapFrame");
       const targetPath = document.getElementById("targetPath");
+      const fakeSurface = document.getElementById("fakeSurface");
+      const revealButton = document.getElementById("revealButton");
+      const resetButton = document.getElementById("resetButton");
+      const statusText = document.getElementById("statusText");
+
       if (frame) {
         frame.src = clickjackingTarget;
       }
       if (targetPath) {
         targetPath.textContent = clickjackingTarget;
+      }
+
+      if (revealButton && fakeSurface && statusText) {
+        revealButton.addEventListener("click", () => {
+          fakeSurface.classList.add("revealed");
+          statusText.textContent = "背後の iframe を可視化しました。見えているのは Shop の本物の購入画面です。";
+        });
+      }
+
+      if (resetButton && fakeSurface && statusText) {
+        resetButton.addEventListener("click", () => {
+          fakeSurface.classList.remove("revealed");
+          statusText.textContent = "いま見えている大きなボタンの位置に、Shop の本物の「購入する」が重なっています。";
+        });
       }
     </script>
   </body>

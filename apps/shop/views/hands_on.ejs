@@ -94,14 +94,15 @@
     <ol>
       <li><a href="/login">ログイン</a>（alice / password123）し、Shop にログイン済み状態にする</li>
       <li>新しいタブで<a href="<%= attackerClickjackingUrl %>" target="_blank" rel="noreferrer">Clickjacking Demo</a>を開く</li>
-      <li>表示された「景品を受け取る」位置をクリックする</li>
+      <li>まず「本物の Shop 画面を表示する」を押し、背後に埋め込まれている <code>/purchase/1</code> を確認する</li>
+      <li>「隠してもう一度試す」で戻し、表示された「景品を受け取る」位置をクリックする</li>
       <li><a href="/orders">注文履歴</a>を開き、自分では Shop 上で購入していないのに注文が追加されていることを確認する</li>
     </ol>
     <p class="muted">
-      原因: フレーム埋め込み防止ヘッダが無いため、攻撃者サイトが正規の購入画面を透明 iframe で重ね、被害者自身にボタンを押させられる
+      原因: フレーム埋め込み防止ヘッダが無いため、攻撃者サイトが正規の購入画面を iframe で重ね、被害者自身に本物のボタンを押させられる
     </p>
     <p class="muted" style="margin-top: 0;">
-      CSRF は攻撃者がリクエストを直接送るのに対し、クリックジャッキングは被害者に正規 UI を誤操作させる点が違います。
+      CSRF は攻撃者が勝手にリクエストを送るのに対し、クリックジャッキングは被害者に正規 UI を誤操作させる点が違います。
     </p>
   </div>
 
