@@ -34,6 +34,11 @@
         <label>コメント本文</label>
         <textarea name="body" rows="3" placeholder="<script>alert(1)</script>"></textarea>
       </div>
+      <div class="form-field">
+        <label>添付画像パス（学習用）</label>
+        <input name="image_path" placeholder="samples/coffee.svg または ../src/server.js" />
+        <div class="muted">画像として表示するファイルパスをそのまま保存します。</div>
+      </div>
       <button type="submit" class="btn btn-primary">投稿</button>
     </form>
   <% } %>
@@ -42,6 +47,15 @@
   <% comments.forEach((c) => { %>
     <div class="card stack">
       <div class="meta"><%= c.created_at %> / <strong><%= c.username %></strong></div>
+      <% if (c.image_path) { %>
+        <div class="stack">
+          <div class="meta">添付画像パス: <code><%= c.image_path %></code></div>
+          <div class="actions">
+            <a class="btn btn-link" href="/comment-images/<%= c.id %>" target="_blank" rel="noreferrer">添付ファイルを開く</a>
+          </div>
+          <img class="comment-image" src="/comment-images/<%= c.id %>" alt="comment attachment <%= c.id %>" />
+        </div>
+      <% } %>
       <div>
         <!-- XSS脆弱性: 無エスケープ -->
         <%- c.body %>

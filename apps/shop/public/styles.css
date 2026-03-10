@@ -360,3 +360,10 @@ pre {
   color: var(--muted);
   font-size: 13px;
 }
+
+.comment-image {
+  max-width: min(100%, 320px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fafc;
+}

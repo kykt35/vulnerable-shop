@@ -97,6 +97,17 @@
       <li>「盗んだセッションで注文履歴を見る」を押し、被害者として注文履歴へアクセスできることを確認する</li>
     </ol>
     <p class="muted">原因: XSS と JavaScript から読めるセッションCookieが組み合わさり、攻撃者が被害者のログイン状態を再利用できる</p>
+      <span class="pill">Traversal</span>
+      <h3 style="margin: 0;">体験⑤ ディレクトリ・トラバーサル</h3>
+    </div>
+    <ol>
+      <li><a href="/login">ログイン</a>（alice / password123）して<a href="/products/1">商品詳細</a>を開く</li>
+      <li>コメント欄の「添付画像パス（学習用）」に <code>samples/coffee.svg</code> を入れて投稿し、通常の画像表示を確認する</li>
+      <li>続けて <code>../src/server.js</code> を入れて投稿する</li>
+      <li>投稿されたコメントの「添付ファイルを開く」をクリックする</li>
+      <li>本来画像しか見えないはずの導線で、サーバーソースが読めることを確認する</li>
+    </ol>
+    <p class="muted">原因: 添付画像パスをサーバーが信用し、許可ディレクトリ外への移動を防いでいない</p>
   </div>
 </div>
 
