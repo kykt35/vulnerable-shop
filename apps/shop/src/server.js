@@ -104,6 +104,18 @@ function ensureDir(dirPath) {
   }
 }
 
+app.get("/", (req, res) => {
+  res.render("home", { currentUser: res.locals.currentUser });
+});
+
+app.get("/hands-on", (req, res) => {
+  res.render("hands_on", {
+    currentUser: res.locals.currentUser,
+    attackerUrl: ATTACKER_URL + "/csrf",
+    attackerCollectorUrl: ATTACKER_URL + "/collect",
+    attackerSessionHijackUrl: ATTACKER_URL + "/session-hijack"
+  });
+});
 function createApp(options) {
   const config = Object.assign(
     {

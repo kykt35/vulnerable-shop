@@ -22,7 +22,7 @@ services:
       context: ./apps/attacker
     environment:
       - PORT=9000
-      - TARGET_BASE=http://localhost:8000
+      - TARGET_BASE=http://shop:8000
     ports:
       - "9000:9000"
     volumes:
