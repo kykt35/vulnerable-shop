@@ -1,136 +1,127 @@
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Session Hijack Demo</title>
-    <style>
-      :root { color-scheme: dark; }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-        background:
-          radial-gradient(circle at top left, rgba(255, 92, 92, 0.35), transparent 34%),
-          linear-gradient(180deg, #12070b 0%, #0a0d14 100%);
-        color: #f5f5f8;
-      }
-      .wrap {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 40px 16px 56px;
-      }
-      .eyebrow {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(255, 107, 107, 0.16);
-        color: #ff9e9e;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-      }
-      h1 {
-        margin: 12px 0 10px;
-        font-size: 36px;
-      }
-      .subtitle {
-        margin: 0 0 24px;
-        color: #cfced9;
-        max-width: 720px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 18px;
-      }
-      .card {
-        background: rgba(14, 17, 25, 0.92);
-        border: 1px solid rgba(255, 116, 116, 0.18);
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
-      }
-      .card h2 {
-        margin: 0 0 10px;
-        font-size: 20px;
-      }
-      .card p, .card li {
-        color: #d4d6df;
-      }
-      .cookie-box {
-        min-height: 84px;
-        margin-top: 12px;
-        padding: 14px;
-        border-radius: 12px;
-        background: #07090f;
-        border: 1px dashed rgba(255, 158, 158, 0.28);
-        word-break: break-all;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      }
-      .btn {
-        display: inline-block;
-        margin-top: 14px;
-        padding: 11px 16px;
-        border-radius: 10px;
-        background: #df4040;
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-      }
-      .muted {
-        color: #9ea3b2;
-        font-size: 13px;
-      }
-      ol {
-        margin: 0;
-        padding-left: 20px;
-      }
-      code {
-        padding: 2px 6px;
-        border-radius: 6px;
-        background: #11151f;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <span class="eyebrow">SESSION HIJACK</span>
-      <h1>盗まれたCookieを確認する</h1>
-      <p class="subtitle">
-        保存型XSSで被害者ブラウザから送られた <code>document.cookie</code> をここで受け取ります。
-        次の Task では、この Cookie を使って被害者セッションを再利用します。
-      </p>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(255, 92, 92, 0.35), transparent 34%),
+      linear-gradient(180deg, #12070b 0%, #0a0d14 100%);
+    color: #f5f5f8;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 16px 56px;
+  }
+  .eyebrow {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 107, 107, 0.16);
+    color: #ff9e9e;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  h1 {
+    margin: 12px 0 10px;
+    font-size: 36px;
+  }
+  .subtitle {
+    margin: 0 0 24px;
+    color: #cfced9;
+    max-width: 720px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: rgba(14, 17, 25, 0.92);
+    border: 1px solid rgba(255, 116, 116, 0.18);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  }
+  .card h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+  }
+  .card p, .card li {
+    color: #d4d6df;
+  }
+  .cookie-box {
+    min-height: 84px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #07090f;
+    border: 1px dashed rgba(255, 158, 158, 0.28);
+    word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    background: #df4040;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .muted {
+    color: #9ea3b2;
+    font-size: 13px;
+  }
+  ol {
+    margin: 0;
+    padding-left: 20px;
+  }
+  code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #11151f;
+  }
+</style>
 
-      <div class="grid">
-        <section class="card">
-          <h2>盗まれたCookie</h2>
-          <p>被害者が XSS を踏むと、直近の値がここに表示されます。</p>
-          <div id="stolenCookie" class="cookie-box">まだ Cookie は盗まれていません。</div>
-          <div class="muted">受信先: <code>/collect?cookie=...</code></div>
-          <a class="btn" href="/replay?path=%2Forders">盗んだセッションで注文履歴を見る</a>
-        </section>
+<div class="wrap">
+  <span class="eyebrow">SESSION HIJACK</span>
+  <h1>盗まれたCookieを確認する</h1>
+  <p class="subtitle">
+    保存型XSSで被害者ブラウザから送られた <code>document.cookie</code> をここで受け取ります。
+    この Cookie を使って、被害者セッションを再利用できます。
+  </p>
 
-        <section class="card">
-          <h2>再現手順</h2>
-          <ol>
-            <li>Shop に <code>alice / password123</code> でログインする</li>
-            <li>商品コメントへ Cookie 送信用の XSS を投稿する</li>
-            <li>商品詳細を再表示し、Attacker 側へ Cookie が送られる</li>
-            <li>この画面で stolen cookie を確認する</li>
-            <li>上のボタンで <code>/orders</code> を開き、被害者の注文履歴を閲覧できることを確認する</li>
-          </ol>
-          <a class="btn" href="/">攻撃者ポータルへ戻る</a>
-        </section>
-      </div>
-    </div>
+  <div class="grid">
+    <section class="card">
+      <h2>盗まれたCookie</h2>
+      <p>被害者が XSS を踏むと、直近の値がここに表示されます。</p>
+      <div id="stolenCookie" class="cookie-box">まだ Cookie は盗まれていません。</div>
+      <div class="muted">受信先: <code>/collect?cookie=...</code></div>
+      <a class="btn" href="/replay?path=%2Forders">盗んだセッションで注文履歴を見る</a>
+    </section>
 
-    <script>
-      var cookie = window.__LAST_STOLEN_COOKIE__ || "";
-      var el = document.getElementById("stolenCookie");
-      if (el && cookie) {
-        el.textContent = cookie;
-      }
-    </script>
-  </body>
-</html>
+    <section class="card">
+      <h2>再現手順</h2>
+      <ol>
+        <li>Shop に <code>alice / password123</code> でログインする</li>
+        <li>商品コメントへ Cookie 送信用の XSS を投稿する</li>
+        <li>商品詳細を再表示し、Attacker 側へ Cookie が送られる</li>
+        <li>この画面で stolen cookie を確認する</li>
+        <li>上のボタンで <code>/orders</code> を開き、被害者の注文履歴を閲覧できることを確認する</li>
+      </ol>
+      <a class="btn" href="/">攻撃者ポータルへ戻る</a>
+    </section>
+  </div>
+</div>
+
+<script>
+  var cookie = window.__LAST_STOLEN_COOKIE__ || "";
+  var el = document.getElementById("stolenCookie");
+  if (el && cookie) {
+    el.textContent = cookie;
+  }
+</script>
