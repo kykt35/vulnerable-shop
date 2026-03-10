@@ -49,7 +49,8 @@ docker compose up
 ### Attacker
 
 - `PORT`（既定: 9000）
-- `TARGET_BASE`（既定: `http://localhost:8000`。攻撃対象のShop URL）
+- `TARGET_BASE`（既定: `http://localhost:8000`。ブラウザから見える Shop URL）
+- `TARGET_INTERNAL_BASE`（既定: `TARGET_BASE` と同じ。Attacker サーバーが中継で使う Shop URL。Docker Compose では `http://shop:8000`）
 
 ## 体験に使う導線（概要）
 

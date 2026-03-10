@@ -8,7 +8,8 @@ COPY server.js /app/server.js
 COPY public /app/public
 
 ENV PORT=9000
-ENV TARGET_BASE=http://shop:8000
+ENV TARGET_BASE=http://localhost:8000
+ENV TARGET_INTERNAL_BASE=http://shop:8000
 EXPOSE 9000
 
 CMD ["node", "server.js"]

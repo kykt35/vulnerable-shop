@@ -101,8 +101,8 @@ async function testClickjackingPageShowsEmbeddedPurchaseTarget() {
     assert(response.body.includes("このページ自身は"));
     assert(response.body.includes("本物の UI"));
     assert(
-      response.body.includes("http://localhost:4000/purchase/1") ||
-        response.body.includes("http:\\/\\/localhost:4000\\/purchase\\/1")
+      response.body.includes("http://localhost:8000/purchase/1") ||
+        response.body.includes("http:\\/\\/localhost:8000\\/purchase\\/1")
     );
   });
 }
