@@ -44,6 +44,7 @@ docker compose up
 - `SESSION_SECRET`（既定: dev-secret）
 - `DATABASE_PATH`（既定: `/data/shop.db`）
 - `ATTACKER_URL`（既定: `http://localhost:9000`。Hands-onページのリンク先に利用）
+- `FILES_ROOT`（既定: `/app/files`。学習用の添付画像パスの基準ディレクトリ）
 
 ### Attacker
 
@@ -59,11 +60,22 @@ docker compose up
   - `/login` のユーザー名/パスワードが文字列結合SQL
   - `/search` の `q` が文字列結合SQL（UNION/コメント構文が有効）
 - **フォーム値改ざん**: `/purchase/:productId` の `unit_price_yen` / `total_yen` を改ざんして送信
+- **ディレクトリ・トラバーサル**:
+  - `/products/:id` のコメントに保存した添付画像パスを `/comment-images/:commentId` が未検証で参照
+  - `../src/server.js` のような値で、想定外のファイルを読み出せる
 - **CSRF**:
   - Attacker の `/` でコメント投稿を偽装
   - Attacker の `/auto-purchase` で購入リクエストを自動送信
 
 詳しい手順は起動後に画面内の「Hands-on」リンクを参照してください（Shop側に手順を表示します）。
+
+## ディレクトリ・トラバーサルの再現手順
+
+1. `alice / password123` でログインし、`/products/1` を開く
+2. コメント欄の「添付画像パス（学習用）」に `samples/coffee.svg` を入れて投稿し、通常の画像表示を確認する
+3. 続けて `../src/server.js` を入れて投稿する
+4. 投稿されたコメントの「添付ファイルを開く」を押す
+5. 本来は画像だけが表示される想定なのに、Shop のサーバーソースが読めることを確認する
 
 ## 注意
 
