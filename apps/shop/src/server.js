@@ -103,19 +103,6 @@ function ensureDir(dirPath) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 }
-
-app.get("/", (req, res) => {
-  res.render("home", { currentUser: res.locals.currentUser });
-});
-
-app.get("/hands-on", (req, res) => {
-  res.render("hands_on", {
-    currentUser: res.locals.currentUser,
-    attackerUrl: ATTACKER_URL + "/csrf",
-    attackerCollectorUrl: ATTACKER_URL + "/collect",
-    attackerSessionHijackUrl: ATTACKER_URL + "/session-hijack"
-  });
-});
 function createApp(options) {
   const config = Object.assign(
     {
@@ -181,7 +168,10 @@ function createApp(options) {
   app.get("/hands-on", (req, res) => {
     res.render("hands_on", {
       currentUser: res.locals.currentUser,
-      attackerUrl: config.attackerUrl + "/csrf"
+      attackerUrl: config.attackerUrl + "/csrf",
+      attackerCollectorUrl: config.attackerUrl + "/collect",
+      attackerSessionHijackUrl: config.attackerUrl + "/session-hijack",
+      attackerClickjackingUrl: config.attackerUrl + "/clickjacking"
     });
   });
 

@@ -59,6 +59,9 @@ docker compose up
 - **セッションハイジャック**:
   - `httpOnly: false` のセッションCookieを、保存型XSSから `document.cookie` で盗める
   - Attacker の `/session-hijack` で stolen cookie を確認し、`/orders` へ再利用できる
+- **クリックジャッキング**:
+  - Shop がフレーム埋め込みを禁止していないため、Attacker の `/clickjacking` から `/purchase/1` を透明 iframe で重ねられる
+  - 被害者に「景品ボタン」を押させるだけで、実際には Shop の購入ボタンをクリックさせられる
 - **SQL Injection**:
   - `/login` のユーザー名/パスワードが文字列結合SQL
   - `/search` の `q` が文字列結合SQL（UNION/コメント構文が有効）
@@ -71,6 +74,14 @@ docker compose up
   - Attacker の `/auto-purchase` で購入リクエストを自動送信
 
 詳しい手順は起動後に画面内の「Hands-on」リンクを参照してください（Shop側に手順を表示します）。
+
+## クリックジャッキングの再現手順
+
+1. `alice / password123` で Shop にログインする
+2. `http://localhost:9000/clickjacking` を開く
+3. 表示された「景品を受け取る」位置をクリックする
+4. `http://localhost:8000/orders` を開く
+5. 自分では Shop の購入画面を操作していないのに、注文が 1 件追加されていることを確認する
 
 ## セッションハイジャックの再現手順
 

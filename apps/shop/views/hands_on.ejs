@@ -10,7 +10,9 @@
 
 <div class="card hero stack">
   <h3 style="margin: 0;">このアプリについて</h3>
-  <p class="muted" style="margin: 0;">意図的に脆弱な実装を含みます。下記の体験シナリオに沿って挙動を確認してください。</p>
+  <p class="muted" style="margin: 0;">
+    意図的に脆弱な実装を含みます。下記の体験シナリオに沿って挙動を確認してください。
+  </p>
 </div>
 
 <div class="stack">
@@ -78,16 +80,35 @@
     <ol>
       <li>ショップにログインした状態にする</li>
       <li>新しいタブで<a href="<%= attackerUrl %>" target="_blank" rel="noreferrer">攻撃用サイト（景品当選サイト）</a>を開く</li>
-      <li>「🎁 景品を受け取る」をクリック</li>
-      <li>ショップの<a href="/products/1">商品詳細（Coffee Beans）</a>を確認し、勝手にコメントが投稿されていることを確認</li>
+      <li>「景品を受け取る」をクリックする</li>
+      <li>ショップの<a href="/products/1">商品詳細（Coffee Beans）</a>を確認し、勝手にコメントが投稿されていることを確認する</li>
     </ol>
     <p class="muted">原因: リクエストが「正しい画面から送られたか」をサーバーが検証していない</p>
   </div>
 
   <div class="card stack">
     <div class="section-title">
+      <span class="pill">Clickjacking</span>
+      <h3 style="margin: 0;">体験⑤ クリックジャッキング</h3>
+    </div>
+    <ol>
+      <li><a href="/login">ログイン</a>（alice / password123）し、Shop にログイン済み状態にする</li>
+      <li>新しいタブで<a href="<%= attackerClickjackingUrl %>" target="_blank" rel="noreferrer">Clickjacking Demo</a>を開く</li>
+      <li>表示された「景品を受け取る」位置をクリックする</li>
+      <li><a href="/orders">注文履歴</a>を開き、自分では Shop 上で購入していないのに注文が追加されていることを確認する</li>
+    </ol>
+    <p class="muted">
+      原因: フレーム埋め込み防止ヘッダが無いため、攻撃者サイトが正規の購入画面を透明 iframe で重ね、被害者自身にボタンを押させられる
+    </p>
+    <p class="muted" style="margin-top: 0;">
+      CSRF は攻撃者がリクエストを直接送るのに対し、クリックジャッキングは被害者に正規 UI を誤操作させる点が違います。
+    </p>
+  </div>
+
+  <div class="card stack">
+    <div class="section-title">
       <span class="pill">Session</span>
-      <h3 style="margin: 0;">体験⑤ セッションハイジャック</h3>
+      <h3 style="margin: 0;">体験⑥ セッションハイジャック</h3>
     </div>
     <ol>
       <li><a href="/login">ログイン</a>（alice / password123）して<a href="/products/1">商品詳細</a>を開く</li>
@@ -96,9 +117,15 @@
       <li>新しいタブで<a href="<%= attackerSessionHijackUrl %>" target="_blank" rel="noreferrer">Session Hijack ページ</a>を開き、盗まれた <code>connect.sid</code> を確認する</li>
       <li>「盗んだセッションで注文履歴を見る」を押し、被害者として注文履歴へアクセスできることを確認する</li>
     </ol>
-    <p class="muted">原因: XSS と JavaScript から読めるセッションCookieが組み合わさり、攻撃者が被害者のログイン状態を再利用できる</p>
+    <p class="muted">
+      原因: XSS と JavaScript から読めるセッションCookieが組み合わさり、攻撃者が被害者のログイン状態を再利用できる
+    </p>
+  </div>
+
+  <div class="card stack">
+    <div class="section-title">
       <span class="pill">Traversal</span>
-      <h3 style="margin: 0;">体験⑤ ディレクトリ・トラバーサル</h3>
+      <h3 style="margin: 0;">体験⑦ ディレクトリ・トラバーサル</h3>
     </div>
     <ol>
       <li><a href="/login">ログイン</a>（alice / password123）して<a href="/products/1">商品詳細</a>を開く</li>
@@ -107,7 +134,9 @@
       <li>投稿されたコメントの「添付ファイルを開く」をクリックする</li>
       <li>本来画像しか見えないはずの導線で、サーバーソースが読めることを確認する</li>
     </ol>
-    <p class="muted">原因: 添付画像パスをサーバーが信用し、許可ディレクトリ外への移動を防いでいない</p>
+    <p class="muted">
+      原因: 添付画像パスをサーバーが信用し、許可ディレクトリ外への移動を防いでいない
+    </p>
   </div>
 </div>
 
