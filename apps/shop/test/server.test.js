@@ -158,7 +158,15 @@ async function run() {
     });
     assert.strictEqual(handsOnResponse.statusCode, 200);
     assert.notStrictEqual(
-      handsOnResponse.body.indexOf(Buffer.from("体験⑤ ディレクトリ・トラバーサル")),
+      handsOnResponse.body.indexOf(Buffer.from("体験⑤ クリックジャッキング")),
+      -1
+    );
+    assert.notStrictEqual(
+      handsOnResponse.body.indexOf(Buffer.from("http://localhost:9000/clickjacking")),
+      -1
+    );
+    assert.notStrictEqual(
+      handsOnResponse.body.indexOf(Buffer.from("体験⑦ ディレクトリ・トラバーサル")),
       -1
     );
   } finally {
